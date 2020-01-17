@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description parse result
- * @Author JoeBlackZ
- * @Date 2020/1/5 12:01
+ * @Description  parse result
+ * @author  JoeBlackZ
+ * @date  2020/1/5 12:01
  */
 @Data
 @Builder

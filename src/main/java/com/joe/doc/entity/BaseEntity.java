@@ -31,4 +31,8 @@ public abstract class BaseEntity implements Serializable {
 
     private String updateUserId;
 
+    private Boolean enabled;
+
+    private String remark;
+
 }

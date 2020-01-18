@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @Description base repository
- * @Author JoezBlackZ
- * @Date 2020/1/3 22:03
+ * @description  base repository
+ * @author  JoezBlackZ
+ * @date  2020/1/3 22:03
  */
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -36,7 +36,7 @@ public abstract class BaseRepository<T> {
     /**
      * subclass
      */
-    private Class<T> entityClass;
+    protected Class<T> entityClass;
 
     /**
      * BaseRepository constructor
@@ -150,7 +150,7 @@ public abstract class BaseRepository<T> {
      * @return 返回该页数据
      */
     public List<T> selectAllByPage(int page, int limit) {
-        Query query = new Query().skip((page - 1) * limit).limit(limit);
+        Query query = new Query().skip((long)(page - 1) * limit).limit(limit);
         return this.mongoTemplate.find(query, entityClass);
     }
 
@@ -184,7 +184,7 @@ public abstract class BaseRepository<T> {
     public List<T> selectByPage(BaseEntity baseEntity, int page, int limit) {
         try {
             Criteria criteria = this.getCriteria(baseEntity);
-            Query query = new Query(criteria).skip((page - 1) * limit).limit(limit);
+            Query query = new Query(criteria).skip((page - 1) * (long)limit).limit(limit);
             return this.mongoTemplate.find(query, entityClass);
         } catch (IllegalAccessException e) {
             if (log.isErrorEnabled()) {

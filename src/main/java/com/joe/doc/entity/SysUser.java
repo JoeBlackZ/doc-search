@@ -2,8 +2,6 @@ package com.joe.doc.entity;
 
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,7 +33,5 @@ public class SysUser extends BaseEntity{
     private String deptId;
 
     private List<String> roles;
-
-    private Date lastPasswordResetDate;
 
 }

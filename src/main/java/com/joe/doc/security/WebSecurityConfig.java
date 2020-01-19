@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,7 +22,7 @@ import java.io.PrintWriter;
 
 /**
  * @author Joe BlackZ
- * @description TODO
+ * @description web security config
  * @date 2020/1/18 21:53
  */
 @Configuration
@@ -39,9 +40,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private AuthenticationAccessDeniedHandler authenticationAccessDeniedHandler;
 
+    @Resource
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(userDetailsService);
+        authenticationManagerBuilder.userDetailsService(this.userDetailsService)
+                .passwordEncoder(this.bCryptPasswordEncoder);
     }
 
     @Override
@@ -63,8 +68,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private AuthenticationSuccessHandler getSuccessHandler() {
         return (httpServletRequest, httpServletResponse, authentication) -> {
+            httpServletResponse.setContentType("application/json;charset=utf-8");
+            httpServletResponse.setCharacterEncoding("UTF-8");
             try (PrintWriter printWriter = httpServletResponse.getWriter()) {
-                httpServletResponse.setContentType("application/json;charset=utf-8");
                 ResponseResult responseResult = ResponseResult.success().msg("Login success").otherData("status", "success");
                 String jsonStr = JSONUtil.toJsonStr(responseResult);
                 printWriter.write(jsonStr);
@@ -75,9 +81,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private AuthenticationFailureHandler getAuthenticationFailureHandler() {
         return (httpServletRequest, httpServletResponse, exception) -> {
+            // set character encoding must before getWriter or chinese will be garbled
+            httpServletResponse.setContentType("application/json;charset=UTF-8");
+            httpServletResponse.setCharacterEncoding("UTF-8");
             try (PrintWriter printWriter = httpServletResponse.getWriter()) {
-                httpServletResponse.setContentType("text/html;charset=UTF-8");
-                httpServletResponse.setCharacterEncoding("utf-8");
                 ResponseResult responseResult = ResponseResult.fail().otherData("status", "error");
                 if (exception instanceof UsernameNotFoundException
                         || exception instanceof BadCredentialsException) {

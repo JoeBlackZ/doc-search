@@ -1,12 +1,12 @@
 package com.joe.doc.controller;
 
 import com.joe.doc.common.ResponseResult;
-import com.joe.doc.entity.SysUser;
 import com.joe.doc.service.SysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -18,6 +18,7 @@ import java.util.Enumeration;
  * @author JoeBlackZ
  * @date  2020/1/5 14:39
  */
+@Slf4j
 @Api(tags = "sys")
 @RequestMapping("/")
 @RestController
@@ -31,12 +32,12 @@ public class MainController {
             @ApiImplicitParam(name = "password", value = "password", type = "String", required = true)
     })
     @ApiOperation(value = "Log in interface.", notes = "you should provide your username and password")
-    @PostMapping("auth/login")
-    private ResponseResult login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
+    @GetMapping("login")
+    public ResponseResult login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headName = headerNames.nextElement();
-            System.err.println(headName + ": " + request.getHeader(headName));
+            log.info(headName + ": " + request.getHeader(headName));
         }
         return ResponseResult.success().otherData(username, password);
     }

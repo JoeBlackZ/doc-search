@@ -1,5 +1,6 @@
 package com.joe.doc.entity;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

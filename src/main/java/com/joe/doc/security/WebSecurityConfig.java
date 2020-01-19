@@ -51,17 +51,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity webSecurity) {
-        webSecurity.ignoring().antMatchers("/v2/api-docs", "/swagger-ui.html");
+        webSecurity.ignoring()
+                .antMatchers("/login", "/register", "/v2/api-docs", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**");
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeRequests()
                 .withObjectPostProcessor(this.getObjectPostProcessor())
-                .and().formLogin().loginProcessingUrl("/login")
-                .usernameParameter("username").passwordParameter("password").permitAll()
-                .failureHandler(this.getAuthenticationFailureHandler())
-                .successHandler(this.getSuccessHandler())
+//                .and().formLogin().loginProcessingUrl("/login")
+//                .usernameParameter("username").passwordParameter("password").permitAll()
+//                .failureHandler(this.getAuthenticationFailureHandler())
+//                .successHandler(this.getSuccessHandler())
                 .and().logout().permitAll()
                 .and().csrf().disable().exceptionHandling().accessDeniedHandler(this.authenticationAccessDeniedHandler);
     }

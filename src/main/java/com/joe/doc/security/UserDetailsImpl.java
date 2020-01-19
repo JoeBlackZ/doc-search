@@ -1,5 +1,6 @@
 package com.joe.doc.security;
 
+import cn.hutool.core.collection.CollUtil;
 import com.joe.doc.entity.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,8 +28,12 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>(this.userInfo.getRoles().size());
-        for (String role : this.userInfo.getRoles()) {
+        List<String> roles = this.userInfo.getRoles();
+        if (CollUtil.isEmpty(roles)) {
+            return Collections.emptyList();
+        }
+        List<GrantedAuthority> authorities = new ArrayList<>(roles.size());
+        for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
         return authorities;

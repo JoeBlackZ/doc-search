@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 /**
- * @Description  main
+ * @description  main
  * @author JoeBlackZ
  * @date  2020/1/5 14:39
  */
@@ -31,8 +31,8 @@ public class MainController {
             @ApiImplicitParam(name = "username", value = "username", type = "String", required = true),
             @ApiImplicitParam(name = "password", value = "password", type = "String", required = true)
     })
-    @ApiOperation(value = "Log in interface.", notes = "you should provide your username and password")
-    @GetMapping("login")
+    @ApiOperation(value = "Log in API.", notes = "You should provide your username and password")
+    @GetMapping(path = "login", params = {"username", "password"})
     public ResponseResult login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {

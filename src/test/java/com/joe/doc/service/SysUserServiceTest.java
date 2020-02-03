@@ -12,7 +12,6 @@ import javax.annotation.Resource;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @SpringBootTest
 class SysUserServiceTest {

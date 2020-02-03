@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
 
 /**
  * @description  main
@@ -33,13 +31,8 @@ public class MainController {
     })
     @ApiOperation(value = "Log in API.", notes = "You should provide your username and password")
     @GetMapping(path = "login", params = {"username", "password"})
-    public ResponseResult login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headName = headerNames.nextElement();
-            log.info(headName + ": " + request.getHeader(headName));
-        }
-        return ResponseResult.success().otherData(username, password);
+    public ResponseResult login(@RequestParam String username, @RequestParam String password) {
+        return this.sysUserService.validateUserLogin(username, password);
     }
 
 

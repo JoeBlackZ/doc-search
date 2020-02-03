@@ -27,7 +27,7 @@ public class UrlAccessDecisionManager implements AccessDecisionManager {
             String attribute = configAttribute.getAttribute();
             if ("ROLE_LOGIN".equals(attribute)) {
                 if (authentication instanceof AnonymousAuthenticationToken) {
-                    throw new BadCredentialsException("User is not logged in.");
+                    throw new BadCredentialsException("The user is not logged in.");
                 } else {
                     return;
                 }

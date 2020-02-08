@@ -6,7 +6,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -16,7 +15,6 @@ import javax.annotation.Resource;
  * @author JoeBlackZ
  * @date  2020/1/5 14:39
  */
-@Slf4j
 @Api(tags = "sys")
 @RequestMapping("/")
 @RestController

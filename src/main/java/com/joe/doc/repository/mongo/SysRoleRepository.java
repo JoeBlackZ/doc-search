@@ -1,4 +1,4 @@
-package com.joe.doc.repository;
+package com.joe.doc.repository.mongo;
 
 import com.joe.doc.entity.SysRole;
 import org.springframework.stereotype.Repository;

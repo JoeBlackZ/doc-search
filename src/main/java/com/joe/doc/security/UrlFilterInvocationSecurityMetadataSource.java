@@ -2,8 +2,8 @@ package com.joe.doc.security;
 
 import com.joe.doc.entity.SysMenu;
 import com.joe.doc.entity.SysRole;
-import com.joe.doc.repository.SysMenuRepository;
-import com.joe.doc.repository.SysRoleRepository;
+import com.joe.doc.repository.mongo.SysMenuRepository;
+import com.joe.doc.repository.mongo.SysRoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;

@@ -1,6 +1,7 @@
 package com.joe.doc.repository;
 
 import com.joe.doc.entity.SysUser;
+import com.joe.doc.repository.mongo.SysUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

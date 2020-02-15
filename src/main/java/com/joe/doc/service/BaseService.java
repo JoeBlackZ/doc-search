@@ -3,7 +3,7 @@ package com.joe.doc.service;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.entity.BaseEntity;
 import com.joe.doc.enumeration.ResponseMessage;
-import com.joe.doc.repository.BaseRepository;
+import com.joe.doc.repository.mongo.BaseRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.joe.doc.repository;
+package com.joe.doc.repository.mongo;
 
 import cn.hutool.core.util.StrUtil;
 import com.joe.doc.entity.SysUser;

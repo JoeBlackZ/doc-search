@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity webSecurity) {
         webSecurity.ignoring()
-                .antMatchers("/login", "/register", "/v2/api-docs", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**");
+                .antMatchers("/login", "/register", "/v2/api-docs", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/actuator/**");
     }
 
     @Override

@@ -3,10 +3,36 @@ server:
   servlet:
     context-path: /
 
+info:
+  app:
+    name: @project.name@
+    description: @project.description@
+    version: @project.version@
+    encoding: @project.build.sourceEncoding@
+    java:
+      version: @java.version@
+
+
 spring:
   data:
     mongodb:
-      host: 192.168.0.108
-      port: 27018
+      host: localhost
+      port: 27017
       database: doc-search
       grid-fs-database: doc-search
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    jmx:
+      exposure:
+        include: '*'
+    web:
+      exposure:
+        include: '*'
+
+logging:
+  level:
+    - org.springframework*: debug

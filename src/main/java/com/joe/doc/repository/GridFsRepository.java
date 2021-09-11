@@ -1,4 +1,4 @@
-package com.joe.doc.repository.mongo;
+package com.joe.doc.repository;
 
 import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;

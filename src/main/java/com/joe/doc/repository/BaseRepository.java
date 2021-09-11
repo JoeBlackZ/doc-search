@@ -1,4 +1,4 @@
-package com.joe.doc.repository.mongo;
+package com.joe.doc.repository;
 
 import com.joe.doc.entity.BaseEntity;
 import com.mongodb.client.result.DeleteResult;

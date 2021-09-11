@@ -2,7 +2,7 @@ package com.joe.doc.security;
 
 import cn.hutool.core.util.StrUtil;
 import com.joe.doc.entity.SysUser;
-import com.joe.doc.repository.mongo.SysUserRepository;
+import com.joe.doc.repository.SysUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

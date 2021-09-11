@@ -3,8 +3,8 @@ package com.joe.doc.service;
 import cn.hutool.core.util.StrUtil;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.entity.SysUser;
-import com.joe.doc.repository.mongo.BaseRepository;
-import com.joe.doc.repository.mongo.SysUserRepository;
+import com.joe.doc.repository.BaseRepository;
+import com.joe.doc.repository.SysUserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

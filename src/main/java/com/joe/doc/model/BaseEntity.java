@@ -1,6 +1,5 @@
-package com.joe.doc.entity;
+package com.joe.doc.model;
 
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

@@ -1,7 +1,7 @@
 package com.joe.doc.repository;
 
 import cn.hutool.core.util.StrUtil;
-import com.joe.doc.entity.SysUser;
+import com.joe.doc.model.SysUser;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 

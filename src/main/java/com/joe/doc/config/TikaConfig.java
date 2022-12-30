@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @Description tika parse config
- * @Author JoezBlackZ
- * @Date 2020/1/4 17:22
+ * @description tika parse config
+ * @author JoeBlackZ
+ * @date 2020/1/4 17:22
  */
 @Configuration
 public class TikaConfig {

@@ -1,8 +1,8 @@
 package com.joe.doc.service;
 
 import com.joe.doc.common.ResponseResult;
-import com.joe.doc.entity.BaseEntity;
-import com.joe.doc.enumeration.ResponseMessage;
+import com.joe.doc.model.BaseEntity;
+import com.joe.doc.constant.ResponseMessage;
 import com.joe.doc.repository.BaseRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @Description base service
- * @Author JoezBlackZ
- * @Date 2020/1/3 23:36
+ * @description base service
+ * @author JoezBlackZ
+ * @date 2020/1/3 23:36
  */
 @Slf4j
 public abstract class BaseService<T extends BaseEntity> {

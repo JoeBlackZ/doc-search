@@ -2,11 +2,10 @@ package com.joe.doc.service;
 
 import cn.hutool.core.collection.CollUtil;
 import com.joe.doc.common.ResponseResult;
-import com.joe.doc.entity.SysUser;
+import com.joe.doc.model.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.Resource;
 
@@ -19,17 +18,13 @@ class SysUserServiceTest {
     @Resource
     private SysUserService sysUserService;
 
-    @Resource
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Test
     void save() {
-        String encode = bCryptPasswordEncoder.encode("123456");
         ArrayList<String> roleList = CollUtil.newArrayList("ADMIN");
         SysUser build = SysUser.builder()
                 .username("admin")
                 .nickname("Administrator")
-                .password(encode)
+                .password("123456")
                 .roles(roleList)
                 .build();
         ResponseResult save = this.sysUserService.save(build);

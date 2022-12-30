@@ -1,7 +1,5 @@
 package com.joe.doc.common;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -12,23 +10,17 @@ import java.util.Map;
  *
  * @author JoezBlackZ
  */
-@ApiModel(value = "response result", description = "This is doc-search web mvc response result, you cam see the detail of every parameter.")
 @Data
 public class ResponseResult {
 
-    @ApiModelProperty(name = "code", notes = "response code of request.")
     private int code;
 
-    @ApiModelProperty(name = "msg", notes = "response message of request.")
     private String msg;
 
-    @ApiModelProperty(name = "data", notes = "response data of request.")
     private Object data;
 
-    @ApiModelProperty(name = "count", notes = "response data count of request, eg: records count.")
     private long count;
 
-    @ApiModelProperty(name = "expandedResults", notes = "response expanded param of request.")
     private Map<String, Object> expandedResults;
 
     private ResponseResult(int code) {

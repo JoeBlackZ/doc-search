@@ -1,4 +1,4 @@
-package com.joe.doc.enumeration;
+package com.joe.doc.constant;
 
 /**
  * @author JoezBlackZ
@@ -20,7 +20,7 @@ public enum ResponseMessage {
     UPLOAD_FILE_SUCCESS("The uploaded file was successful."),
     UPLOAD_FILE_FAIL("The uploaded file failed.");
 
-    private String message;
+    private final String message;
 
     ResponseMessage(String message) {
         this.message = message;

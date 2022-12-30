@@ -1,4 +1,4 @@
-package com.joe.doc.entity;
+package com.joe.doc.model;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description  parse result
+ * @description  parse result
  * @author  JoeBlackZ
  * @date  2020/1/5 12:01
  */

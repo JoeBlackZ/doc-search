@@ -1,7 +1,7 @@
 package com.joe.doc.service;
 
 import cn.hutool.core.io.FileUtil;
-import com.joe.doc.entity.TikaModel;
+import com.joe.doc.model.TikaModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
@@ -12,9 +12,9 @@ import javax.annotation.Resource;
 import java.io.*;
 
 /**
- * @Description parse service
- * @Author JoeBlackZ
- * @Date 2020/1/5 11:57
+ * @description parse service
+ * @author JoeBlackZ
+ * @date 2020/1/5 11:57
  */
 @Slf4j
 @Service

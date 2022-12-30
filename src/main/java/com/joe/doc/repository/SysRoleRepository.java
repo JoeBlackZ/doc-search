@@ -1,6 +1,6 @@
 package com.joe.doc.repository;
 
-import com.joe.doc.entity.SysRole;
+import com.joe.doc.model.SysRole;
 import org.springframework.stereotype.Repository;
 
 /**

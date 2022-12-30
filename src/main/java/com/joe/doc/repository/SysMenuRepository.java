@@ -1,6 +1,6 @@
 package com.joe.doc.repository;
 
-import com.joe.doc.entity.SysMenu;
+import com.joe.doc.model.SysMenu;
 import org.springframework.stereotype.Repository;
 
 /**

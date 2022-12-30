@@ -1,4 +1,4 @@
-package com.joe.doc.entity;
+package com.joe.doc.model;
 
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;

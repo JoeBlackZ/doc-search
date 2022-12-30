@@ -1,10 +1,9 @@
 package com.joe.doc.repository;
 
-import com.joe.doc.entity.SysUser;
+import com.joe.doc.model.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -17,14 +16,11 @@ class SysUserRepositoryTest {
     @Resource
     private SysUserRepository sysUserRepository;
 
-    @Resource
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Test
     void insert() {
         SysUser sysUser = SysUser.builder()
                 .username("admin")
-                .password(bCryptPasswordEncoder.encode("123456"))
+                .password("123456")
                 .nickname("Administrator")
                 .email("zhangqi13c@163.com")
                 .build();

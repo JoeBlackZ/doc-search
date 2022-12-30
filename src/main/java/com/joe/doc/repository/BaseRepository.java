@@ -1,6 +1,6 @@
 package com.joe.doc.repository;
 
-import com.joe.doc.entity.BaseEntity;
+import com.joe.doc.model.BaseEntity;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;

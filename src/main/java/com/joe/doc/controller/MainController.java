@@ -1,9 +1,7 @@
 package com.joe.doc.controller;
 
-import com.joe.doc.service.SysUserService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 /**
  * @description  main
@@ -11,10 +9,7 @@ import javax.annotation.Resource;
  * @date  2020/1/5 14:39
  */
 @RequestMapping("/")
-@RestController
+@Controller
 public class MainController {
-
-    @Resource
-    private SysUserService sysUserService;
 
 }

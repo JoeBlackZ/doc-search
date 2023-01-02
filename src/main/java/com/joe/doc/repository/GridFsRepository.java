@@ -28,8 +28,9 @@ public class GridFsRepository {
 
     /**
      * Store file into mongodb gridFs
+     *
      * @param inputStream file stream
-     * @param filename filename
+     * @param filename    filename
      * @return file objectId in gridFs
      */
     public String store(InputStream inputStream, String filename) {
@@ -39,22 +40,22 @@ public class GridFsRepository {
 
     /**
      * Store file info mongodb gridFs
+     *
      * @param file file
      * @return file objectId in gridFs
      */
     public String store(File file) {
-        try (BufferedInputStream bufferedInputStream = FileUtil.getInputStream(file)){
+        try (BufferedInputStream bufferedInputStream = FileUtil.getInputStream(file)) {
             return this.store(bufferedInputStream, file.getName());
         } catch (IOException e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
         return null;
     }
 
     /**
      * remove file in gridFs
+     *
      * @param objectId file objectId
      */
     public void remove(String objectId) {

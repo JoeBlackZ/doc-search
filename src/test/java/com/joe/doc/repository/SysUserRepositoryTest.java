@@ -24,7 +24,6 @@ class SysUserRepositoryTest {
                 .nickname("Administrator")
                 .email("zhangqi13c@163.com")
                 .build();
-        sysUser.setEnabled(true);
         SysUser insert = this.sysUserRepository.insert(sysUser);
         log.info(insert.getId());
     }

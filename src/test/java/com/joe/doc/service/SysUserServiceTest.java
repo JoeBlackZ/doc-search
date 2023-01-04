@@ -5,6 +5,7 @@ import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.SysUser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -53,6 +54,7 @@ class SysUserServiceTest {
 
     @Test
     void findAllByPage() {
+        log.info(new ObjectId().toString());
         ResponseResult allByPage = this.sysUserService.findAllByPage(1, 10);
         log.info(String.valueOf(allByPage));
     }

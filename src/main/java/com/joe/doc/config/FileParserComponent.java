@@ -5,12 +5,10 @@ import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.Resource;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
+import java.io.*;
 import java.util.Objects;
 
 /**
@@ -22,11 +20,11 @@ public class FileParserComponent {
     @Resource
     private Tika tika;
 
-    public TikaModel parse(MultipartFile multipartFile) {
-        if (Objects.isNull(multipartFile)) {
+    public TikaModel parse(File file) {
+        if (Objects.isNull(file)) {
             return null;
         }
-        try (BufferedInputStream buffer = new BufferedInputStream(multipartFile.getInputStream())) {
+        try (BufferedInputStream buffer = new BufferedInputStream(new FileInputStream(file))) {
             return this.parse(buffer);
         } catch (IOException e) {
             throw new RuntimeException("文件解析异常.", e);
@@ -37,7 +35,7 @@ public class FileParserComponent {
         if (Objects.isNull(inputStream)) {
             return null;
         }
-        try (BufferedInputStream buffer = new BufferedInputStream(inputStream)) {
+        try (InputStream buffer = inputStream instanceof BufferedInputStream ? inputStream : new BufferedInputStream(inputStream)) {
             Metadata metadata = new Metadata();
             String content = this.tika.parseToString(buffer, metadata);
             return TikaModel.builder().content(content).metadata(metadata).build();

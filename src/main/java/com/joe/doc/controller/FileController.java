@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author Joe BlackZ
@@ -27,10 +30,16 @@ public class FileController {
             @Parameter(name = "page", description = "页码", in = ParameterIn.PATH),
             @Parameter(name = "limit", description = "每页条数", in = ParameterIn.PATH)
     })
-    @GetMapping(path = "/fileList")
+    @GetMapping(path = "/list")
     public ResponseResult list(@RequestParam(required = false, defaultValue = "1") Integer page,
                                @RequestParam(required = false, defaultValue = "20") Integer limit) {
         return this.fileInfoService.findAllByPage(page, limit);
     }
 
+    @Operation(summary = "上传文档")
+    @Parameter(name = "files", description = "文件", in = ParameterIn.DEFAULT, ref = "file")
+    @PostMapping("/upload")
+    public ResponseResult upload(@RequestParam("files") List<MultipartFile> files) {
+        return this.fileInfoService.upload(files);
+    }
 }

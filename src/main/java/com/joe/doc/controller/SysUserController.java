@@ -4,7 +4,7 @@ import com.joe.doc.common.ResponseResult;
 import com.joe.doc.service.SysUserService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * @author Joe BlackZ
@@ -16,7 +16,7 @@ public class SysUserController {
     @Resource
     private SysUserService sysUserService;
 
-    @GetMapping(path = "/")
+    @GetMapping
     public ResponseResult list(@RequestParam(required = false, defaultValue = "1") Integer page,
                                @RequestParam(required = false, defaultValue = "20") Integer limit) {
         return this.sysUserService.findAllByPage(page, limit);

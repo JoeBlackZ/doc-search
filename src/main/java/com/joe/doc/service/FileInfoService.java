@@ -2,19 +2,18 @@ package com.joe.doc.service;
 
 import com.joe.doc.config.FileParserComponent;
 import com.joe.doc.model.FileInfo;
+import com.joe.doc.model.TikaModel;
 import com.joe.doc.repository.BaseRepository;
 import com.joe.doc.repository.FileInfoRepository;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
-import java.io.InputStream;
 
 /**
- * @description sys user service
  * @author JoezBlackZ
+ * @description sys user service
  * @date 2020/1/4 10:08
  */
 @Slf4j
@@ -36,10 +35,12 @@ public class FileInfoService extends BaseService<FileInfo> {
         for (MultipartFile file : files) {
             String originalFilename = file.getOriginalFilename();
             log.info("Filename: {}", originalFilename);
+            TikaModel tikaModel = this.fileParserComponent.parse(file);
             FileInfo fileInfo = FileInfo.builder()
                     .filename(originalFilename)
                     .length(file.getSize())
                     .contentType(file.getContentType())
+                    .metadata(tikaModel.getMetadataAsMap())
                     .build();
             this.fileInfoRepository.insert(fileInfo);
         }

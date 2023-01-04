@@ -3,11 +3,11 @@ package com.joe.doc.service;
 import cn.hutool.core.collection.CollUtil;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.SysUser;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 
 import java.util.ArrayList;
 
@@ -59,8 +59,9 @@ class SysUserServiceTest {
 
     @Test
     void find() {
-        ResponseResult joe_blackZ = this.sysUserService.find(SysUser.builder().username("Joe BlackZ").build());
-        log.info(String.valueOf(joe_blackZ));
+        SysUser sysUser = SysUser.builder().username("Joe BlackZ").build();
+        ResponseResult responseResult = this.sysUserService.find(sysUser);
+        log.info(String.valueOf(responseResult));
     }
 
     @Test

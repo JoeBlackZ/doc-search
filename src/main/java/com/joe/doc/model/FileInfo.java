@@ -23,6 +23,6 @@ public class FileInfo extends BaseEntity{
     private String contentType;
     private Long length;
     private Date lastModifyDate;
-    private Map<String, String> metadata;
+    private Map<String, Object> metadata;
 
 }

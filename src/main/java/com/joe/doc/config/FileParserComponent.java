@@ -7,7 +7,7 @@ import org.apache.tika.metadata.Metadata;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;

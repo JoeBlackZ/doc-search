@@ -1,11 +1,11 @@
 package com.joe.doc.repository;
 
 import com.joe.doc.model.SysUser;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 

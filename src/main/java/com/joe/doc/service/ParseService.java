@@ -2,13 +2,13 @@ package com.joe.doc.service;
 
 import cn.hutool.core.io.FileUtil;
 import com.joe.doc.model.TikaModel;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.*;
 
 /**

@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @description base service
  * @author JoezBlackZ
+ * @description base service
  * @date 2020/1/3 23:36
  */
 @Slf4j
@@ -26,8 +26,6 @@ public abstract class BaseService<T extends BaseEntity> {
     public abstract BaseRepository<T> getRepository();
 
     /**
-     *
-     *
      * @param t 要保存的数据
      * @return 返回保存结果
      */
@@ -133,8 +131,7 @@ public abstract class BaseService<T extends BaseEntity> {
     public ResponseResult findAllByPage(int pageNum, int pageSize) {
         try {
             List<T> allByPage = this.getRepository().selectAllByPage(pageNum, pageSize);
-            long count = this.getRepository().count();
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(allByPage).count(count);
+            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(allByPage);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error(e.getMessage(), e);
@@ -163,8 +160,7 @@ public abstract class BaseService<T extends BaseEntity> {
                 return this.findAllByPage(page, limit);
             }
             List<T> byPage = this.getRepository().selectByPage(baseEntity, page, limit);
-            long count = this.getRepository().count(baseEntity);
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(byPage).count(count);
+            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(byPage);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error(e.getMessage(), e);

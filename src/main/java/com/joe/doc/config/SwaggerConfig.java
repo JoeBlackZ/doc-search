@@ -41,10 +41,9 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenApi() {
-        Info info = new Info().title("XXX用户系统API").version("1.0")
-                .description("Knife4j集成springdoc-openapi示例")
-                .termsOfService("http://doc.xiaominfo.com")
-                .license(new License().name("Apache 2.0").url("http://doc.xiaominfo.com"));
+        Info info = new Info().title("文档管理系统API").version("1.0")
+                .description("文档管理")
+                .license(new License().name("Apache 2.0"));
         return new OpenAPI().info(info);
     }
 

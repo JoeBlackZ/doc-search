@@ -19,9 +19,7 @@ public class ResponseResult {
 
     private Object data;
 
-    private long count;
-
-    private Map<String, Object> expandedResults;
+    private long timestamp = System.currentTimeMillis();
 
     private ResponseResult(int code) {
         this.code = code;
@@ -42,19 +40,6 @@ public class ResponseResult {
 
     public ResponseResult data(Object object) {
         this.data = object;
-        return this;
-    }
-
-    public ResponseResult count(long count) {
-        this.count = count;
-        return this;
-    }
-
-    public ResponseResult otherData(String key, Object value) {
-        if (this.expandedResults == null) {
-            this.expandedResults = new HashMap<>(16);
-        }
-        this.expandedResults.put(key, value);
         return this;
     }
 

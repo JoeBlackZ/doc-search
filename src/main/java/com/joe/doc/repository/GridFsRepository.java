@@ -1,10 +1,12 @@
 package com.joe.doc.repository;
 
 import cn.hutool.core.io.FileUtil;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -67,5 +69,15 @@ public class GridFsRepository {
     public void remove(Object[] objectId) {
         Criteria id = Criteria.where("_id").in(objectId);
         this.gridFsTemplate.delete(new Query(id));
+    }
+
+    public GridFSFile getGridFsFile(String objectId) {
+        Criteria id = Criteria.where("_id").in(objectId);
+        return this.gridFsTemplate.findOne(new Query(id));
+    }
+
+    public GridFsResource getGridFsFileResource(String objectId) {
+        GridFSFile gridFsFile = this.getGridFsFile(objectId);
+        return this.gridFsTemplate.getResource(gridFsFile);
     }
 }

@@ -16,12 +16,9 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class FileInfo extends BaseEntity{
+public class FileParseInfo extends BaseEntity{
 
-    private String filename;
-    private String md5;
-    private String contentType;
-    private Long length;
+    private Date lastModifyDate;
     private Map<String, Object> metadata;
 
 }

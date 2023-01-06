@@ -1,6 +1,8 @@
 package com.joe.doc.config;
 
+import com.joe.doc.model.FileInfo;
 import com.joe.doc.model.TikaModel;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -10,6 +12,7 @@ import jakarta.annotation.Resource;
 
 import java.io.*;
 import java.util.Objects;
+import java.util.concurrent.*;
 
 /**
  * @author zhangqi
@@ -19,6 +22,10 @@ public class FileParserComponent {
 
     @Resource
     private Tika tika;
+
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 2, 1800,
+            TimeUnit.SECONDS, new ArrayBlockingQueue<>(1024), new ThreadPoolExecutor.CallerRunsPolicy()
+    );
 
     public TikaModel parse(File file) {
         if (Objects.isNull(file)) {
@@ -42,6 +49,10 @@ public class FileParserComponent {
         } catch (IOException | TikaException e) {
             throw new RuntimeException("文件解析异常.", e);
         }
+    }
+
+    public void submitFileParseTask(Runnable runnable) {
+        this.executor.submit(runnable);
     }
 
 }

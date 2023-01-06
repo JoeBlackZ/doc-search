@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author JoezBlackZ
- * @description SysUserReponsitory
+ * @description FileInfoRepository
  * @date 2020/1/3 22:22
  */
 @Repository

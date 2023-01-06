@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * @description  SysUserReponsitory
+ * @description  SysUserRepository
  * @author  JoezBlackZ
  * @date  2020/1/3 22:22
  */

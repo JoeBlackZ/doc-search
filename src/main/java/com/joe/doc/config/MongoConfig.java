@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.convert.CustomConversions;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
  * @author JoeBlackZ
  * @date 2020/1/2 23:53
  */
+@EnableMongoAuditing
 @Configuration
 public class MongoConfig {
 

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
 
 import jakarta.annotation.Resource;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -58,8 +59,13 @@ public class GridFsRepository {
      *
      * @param objectId file objectId
      */
-    public void remove(String objectId) {
+    public void remove(Object objectId) {
         Criteria id = Criteria.where("_id").is(objectId);
+        this.gridFsTemplate.delete(new Query(id));
+    }
+
+    public void remove(Object[] objectId) {
+        Criteria id = Criteria.where("_id").in(objectId);
         this.gridFsTemplate.delete(new Query(id));
     }
 }

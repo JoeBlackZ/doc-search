@@ -1,6 +1,5 @@
 package com.joe.doc.service;
 
-import cn.hutool.core.collection.CollUtil;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.SysUser;
 import jakarta.annotation.Resource;
@@ -9,8 +8,9 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.Objects;
 
-import java.util.ArrayList;
 
 @Slf4j
 @SpringBootTest
@@ -21,15 +21,19 @@ class SysUserServiceTest {
 
     @Test
     void save() {
-        ArrayList<String> roleList = CollUtil.newArrayList("ADMIN");
         SysUser build = SysUser.builder()
                 .username("admin")
                 .nickname("Administrator")
                 .password("123456")
-                .roles(roleList)
+                .email("zhangqi13c@163.com")
+                .phoneNumber("18192149901")
                 .build();
-        ResponseResult save = this.sysUserService.save(build);
-        log.info(save.getData().toString());
+        ResponseResult responseResult = this.sysUserService.save(build);
+        if (Objects.equals(responseResult.getCode(), 0)) {
+            log.info(responseResult.getData().toString());
+        } else {
+            log.info(responseResult.toString());
+        }
     }
 
     @Test
@@ -46,6 +50,8 @@ class SysUserServiceTest {
 
     @Test
     void testRemoveByIds() {
+        ResponseResult responseResult = this.sysUserService.removeByIds(List.of("63b637510fd2d960e02cfb23"));
+        log.info(responseResult.toString());
     }
 
     @Test

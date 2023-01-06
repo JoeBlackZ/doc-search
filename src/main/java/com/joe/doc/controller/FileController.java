@@ -42,4 +42,10 @@ public class FileController {
     public ResponseResult upload(@RequestParam("files") List<MultipartFile> files) {
         return this.fileInfoService.upload(files);
     }
+
+    @Operation(summary = "删除文档")
+    @DeleteMapping
+    public ResponseResult delete(@RequestBody String[] fileInfoIds) {
+        return this.fileInfoService.removeByIds(fileInfoIds);
+    }
 }

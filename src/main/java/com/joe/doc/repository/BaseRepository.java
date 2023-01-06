@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import jakarta.annotation.Resource;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -19,9 +20,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @description  base repository
- * @author  JoezBlackZ
- * @date  2020/1/3 22:03
+ * @author JoezBlackZ
+ * @description base repository
+ * @date 2020/1/3 22:03
  */
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -104,7 +105,7 @@ public abstract class BaseRepository<T> {
      * @param ids one or multiple id
      * @return count of delete
      */
-    public final long deleteByIds(final Object... ids) {
+    public long deleteByIds(final Object... ids) {
         final Query query = new Query(Criteria.where("_id").in(ids));
         final DeleteResult deleteResult = this.mongoTemplate.remove(query, entityClass);
         return deleteResult.getDeletedCount();
@@ -150,7 +151,7 @@ public abstract class BaseRepository<T> {
      * @return 返回该页数据
      */
     public List<T> selectAllByPage(int page, int limit) {
-        Query query = new Query().skip((long)(page - 1) * limit).limit(limit);
+        Query query = new Query().skip((long) (page - 1) * limit).limit(limit);
         return this.mongoTemplate.find(query, entityClass);
     }
 
@@ -177,14 +178,14 @@ public abstract class BaseRepository<T> {
      * 根据实体对象中的属性以及其中的分页信息查询数据
      *
      * @param baseEntity query parameters
-     * @param page current page
-     * @param limit size of each page
+     * @param page       current page
+     * @param limit      size of each page
      * @return match result
      */
     public List<T> selectByPage(BaseEntity baseEntity, int page, int limit) {
         try {
             Criteria criteria = this.getCriteria(baseEntity);
-            Query query = new Query(criteria).skip((page - 1) * (long)limit).limit(limit);
+            Query query = new Query(criteria).skip((page - 1) * (long) limit).limit(limit);
             return this.mongoTemplate.find(query, entityClass);
         } catch (IllegalAccessException e) {
             if (log.isErrorEnabled()) {

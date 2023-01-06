@@ -32,6 +32,4 @@ public class SysUser extends BaseEntity{
 
     private String deptId;
 
-    private List<String> roles;
-
 }

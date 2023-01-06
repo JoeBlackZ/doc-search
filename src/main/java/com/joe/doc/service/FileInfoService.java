@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -41,23 +43,29 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     public ResponseResult upload(List<MultipartFile> multipartFiles) {
+        List<FileInfo> fileInfos = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             String originalFilename = multipartFile.getOriginalFilename();
+            if (multipartFile.isEmpty()) {
+                log.error("File {} is empty, skip it.", originalFilename);
+                continue;
+            }
             log.info("Filename: {}", originalFilename);
-            File file = this.writeFileToLocalFile(multipartFile);
-            String objectId = this.gridFsRepository.store(file);
-            TikaModel tikaModel = this.fileParserComponent.parse(file);
-            FileInfo fileInfo = FileInfo.builder()
-                    .filename(originalFilename)
-                    .length(multipartFile.getSize())
-                    .contentType(multipartFile.getContentType())
-                    .metadata(tikaModel.getMetadataAsMap())
-                    .build();
-            fileInfo.setId(objectId);
-            log.info("File Content: {}", tikaModel.getContent());
-            this.fileInfoRepository.insert(fileInfo);
+            try (BufferedInputStream buffer = new BufferedInputStream(multipartFile.getInputStream())) {
+                String objectId = this.gridFsRepository.store(buffer, originalFilename);
+                FileInfo fileInfo = FileInfo.builder()
+                        .filename(originalFilename)
+                        .length(multipartFile.getSize())
+                        .contentType(multipartFile.getContentType())
+                        .build();
+                fileInfo.setId(objectId);
+                fileInfos.add(fileInfo);
+            } catch (IOException e) {
+                throw new RuntimeException("文件[" + originalFilename + "]解析失败.", e);
+            }
         }
-        return ResponseResult.success();
+        log.info("File count: {}, FileInfo count: {}", multipartFiles.size(), fileInfos.size());
+        return this.saveAll(fileInfos);
     }
 
     private File writeFileToLocalFile(MultipartFile multipartFile) {
@@ -69,6 +77,11 @@ public class FileInfoService extends BaseService<FileInfo> {
         } catch (IOException e) {
             throw new RuntimeException("文件写入本地异常.", e);
         }
+    }
 
+    @Override
+    public ResponseResult removeByIds(Object[] ids) {
+        this.gridFsRepository.remove(ids);
+        return super.removeByIds(ids);
     }
 }

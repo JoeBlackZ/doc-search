@@ -2,9 +2,6 @@ package com.joe.doc.common;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * spring mvc response result
  *

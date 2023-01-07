@@ -3,7 +3,6 @@ package com.joe.doc.model;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -18,7 +17,6 @@ import java.util.Map;
 @Document
 public class FileParseInfo extends BaseEntity{
 
-    private Date lastModifyDate;
     private Map<String, Object> metadata;
 
 }

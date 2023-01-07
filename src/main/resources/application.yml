@@ -16,6 +16,9 @@ spring:
       max-request-size: 100MB
   application:
     name: doc-search
+  jackson:
+    time-zone: Asia/Shanghai
+
 
 springdoc:
   swagger-ui:
@@ -34,3 +37,7 @@ knife4j:
   setting:
     language: zh_cn
     swagger-model-name: 实体类列表
+
+logging:
+  level:
+    root: info

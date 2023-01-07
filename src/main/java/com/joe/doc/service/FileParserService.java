@@ -1,8 +1,6 @@
-package com.joe.doc.config;
+package com.joe.doc.service;
 
-import com.joe.doc.model.FileInfo;
 import com.joe.doc.model.TikaModel;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -18,7 +16,7 @@ import java.util.concurrent.*;
  * @author zhangqi
  */
 @Component
-public class FileParserComponent {
+public class FileParserService {
 
     @Resource
     private Tika tika;

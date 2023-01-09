@@ -2,6 +2,8 @@ package com.joe.doc.common;
 
 import lombok.Data;
 
+import java.util.Objects;
+
 /**
  * spring mvc response result
  *
@@ -23,11 +25,11 @@ public class ResponseResult {
     }
 
     public static ResponseResult success() {
-        return new ResponseResult(0);
+        return new ResponseResult(200);
     }
 
     public static ResponseResult fail() {
-        return new ResponseResult(1);
+        return new ResponseResult(500);
     }
 
     public ResponseResult msg(Object object) {
@@ -38,6 +40,10 @@ public class ResponseResult {
     public ResponseResult data(Object object) {
         this.data = object;
         return this;
+    }
+
+    public boolean ok() {
+        return Objects.equals(this.code, 200);
     }
 
 }

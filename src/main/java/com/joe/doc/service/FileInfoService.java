@@ -106,7 +106,11 @@ public class FileInfoService extends BaseService<FileInfo> {
         // 删除文件解析的信息
         this.fileParseInfoRepository.deleteByIds(ids);
         // 删除文件信息
-        return super.removeByIds(ids);
+        ResponseResult responseResult = super.removeByIds(ids);
+        if (responseResult.ok()) {
+            log.info("文件删除成功，文件ID: {}", Arrays.toString(ids));
+        }
+        return responseResult;
     }
 
     private FileParseInfo dealFileParseInfo(Map<String, Object> metadataAsMap) {

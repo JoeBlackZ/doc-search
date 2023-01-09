@@ -18,7 +18,6 @@ import java.util.Map;
 public class TikaModel {
 
     private String content;
-
     private Metadata metadata;
 
     /**

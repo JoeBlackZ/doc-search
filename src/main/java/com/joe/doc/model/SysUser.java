@@ -19,17 +19,11 @@ import java.util.List;
 public class SysUser extends BaseEntity{
 
     private String username;
-
     private String nickname;
-
     private String password;
-
     private String phoneNumber;
-
     private String email;
-
     private String avatar;
-
     private String deptId;
 
 }

@@ -2,6 +2,8 @@ package com.joe.doc.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.FileInfo;
 import com.joe.doc.model.FileParseInfo;
@@ -72,6 +74,8 @@ public class FileInfoService extends BaseService<FileInfo> {
                 }
                 // 提交解析文件任务
                 this.submitFileParseTask(fileInfoId);
+                // 提交计算文件MD5的任务
+                this.submitCalcFileMd5Task(fileInfoId);
                 fileInfoIds.add(fileInfoId);
             } catch (IOException e) {
                 throw new RuntimeException("文件[" + originalFilename + "]解析失败.", e);
@@ -93,6 +97,20 @@ public class FileInfoService extends BaseService<FileInfo> {
                 if (Objects.nonNull(insert.getId())) {
                     log.info("文件 {} 解析完成.", fileInfoId);
                 }
+            } catch (Exception e) {
+                log.error("文件解析异常.", e);
+            }
+        });
+    }
+
+    private void submitCalcFileMd5Task(String fileInfoId) {
+        GridFsResource resource = this.gridFsRepository.getGridFsFileResource(fileInfoId);
+        this.fileParserService.submitFileParseTask(() -> {
+            try (BufferedInputStream buffer = new BufferedInputStream(resource.getInputStream())) {
+                String md5Hex = DigestUtil.md5Hex(buffer);
+                FileParseInfo fileParseInfo = FileParseInfo.builder().md5(md5Hex).build();
+                fileParseInfo.setId(fileInfoId);
+                fileParseInfoRepository.updateById(fileParseInfo);
             } catch (Exception e) {
                 log.error("文件解析异常.", e);
             }

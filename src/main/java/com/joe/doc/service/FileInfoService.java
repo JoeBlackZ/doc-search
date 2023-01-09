@@ -3,7 +3,6 @@ package com.joe.doc.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.crypto.digest.MD5;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.FileInfo;
 import com.joe.doc.model.FileParseInfo;

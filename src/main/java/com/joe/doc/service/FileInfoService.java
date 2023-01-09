@@ -93,7 +93,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                 if (Objects.nonNull(insert.getId())) {
                     log.info("文件 {} 解析完成.", fileInfoId);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("文件解析异常.", e);
             }
         });

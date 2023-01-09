@@ -55,7 +55,6 @@ public class FileInfoService extends BaseService<FileInfo> {
                 log.error("File {} is empty, skip it.", originalFilename);
                 continue;
             }
-            log.info("文件名称: {}", originalFilename);
             try (BufferedInputStream buffer = new BufferedInputStream(multipartFile.getInputStream())) {
                 // 保存文件
                 String fileInfoId = this.gridFsRepository.store(buffer, originalFilename);

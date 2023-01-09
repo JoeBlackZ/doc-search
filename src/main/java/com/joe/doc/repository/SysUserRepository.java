@@ -8,21 +8,19 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * @description  SysUserRepository
- * @author  JoezBlackZ
- * @date  2020/1/3 22:22
+ * @author JoezBlackZ
+ * @description SysUserRepository
+ * @date 2020/1/3 22:22
  */
 @Repository
 public class SysUserRepository extends BaseRepository<SysUser> {
 
     public SysUser selectByUsername(String username) {
-        if (StrUtil.isNotBlank(username)) {
-            List<SysUser> sysUsers = this.mongoTemplate.find(new Query(), SysUser.class);
-            if (!sysUsers.isEmpty()) {
-                return sysUsers.get(0);
-            }
+        if (StrUtil.isBlank(username)) {
+            return null;
         }
-        return null;
+        List<SysUser> sysUsers = this.mongoTemplate.find(new Query(), SysUser.class);
+        return sysUsers.isEmpty() ? null : sysUsers.get(0);
     }
 
 }

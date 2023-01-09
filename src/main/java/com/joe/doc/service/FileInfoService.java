@@ -55,7 +55,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                 log.error("File {} is empty, skip it.", originalFilename);
                 continue;
             }
-            log.info("Filename: {}", originalFilename);
+            log.info("文件名称: {}", originalFilename);
             try (BufferedInputStream buffer = new BufferedInputStream(multipartFile.getInputStream())) {
                 // 保存文件
                 String fileInfoId = this.gridFsRepository.store(buffer, originalFilename);
@@ -67,7 +67,10 @@ public class FileInfoService extends BaseService<FileInfo> {
                 fileInfo.setId(fileInfoId);
                 fileInfo.setCreateDate(new Date());
                 // 保存文件信息
-                this.fileInfoRepository.insert(fileInfo);
+                FileInfo insert = this.fileInfoRepository.insert(fileInfo);
+                if (Objects.nonNull(insert.getId())) {
+                    log.info("文件 {}({}) 上传并保存成功.", fileInfoId, originalFilename);
+                }
                 // 提交解析文件任务
                 this.submitFileParseTask(fileInfoId);
                 fileInfoIds.add(fileInfoId);
@@ -75,7 +78,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                 throw new RuntimeException("文件[" + originalFilename + "]解析失败.", e);
             }
         }
-        log.info("File count: {}, FileInfo count: {}", multipartFiles.size(), fileInfoIds.size());
+        log.info("上传文件数量: {}, 提交文件数量: {}", multipartFiles.size(), fileInfoIds.size());
         return ResponseResult.success().data(fileInfoIds).msg("文件上传完成，文件信息保存成功，异步解析任务提交成功。");
     }
 
@@ -87,7 +90,10 @@ public class FileInfoService extends BaseService<FileInfo> {
                 Map<String, Object> metadataAsMap = tikaModel.getMetadataAsMap();
                 FileParseInfo fileParseInfo = dealFileParseInfo(metadataAsMap);
                 fileParseInfo.setId(fileInfoId);
-                fileParseInfoRepository.insert(fileParseInfo);
+                FileParseInfo insert = fileParseInfoRepository.insert(fileParseInfo);
+                if (Objects.nonNull(insert.getId())) {
+                    log.info("文件 {} 解析完成.", fileInfoId);
+                }
             } catch (IOException e) {
                 log.error("文件解析异常.", e);
             }
@@ -105,9 +111,7 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     private FileParseInfo dealFileParseInfo(Map<String, Object> metadataAsMap) {
-        FileParseInfo fileParseInfo = FileParseInfo.builder()
-                .metadata(metadataAsMap)
-                .build();
+        FileParseInfo fileParseInfo = FileParseInfo.builder().metadata(metadataAsMap).build();
         Object dcCreator = metadataAsMap.get("dc:creator");
         if (Objects.nonNull(dcCreator)) {
             fileParseInfo.setCreateUserId(dcCreator.toString());
@@ -116,6 +120,16 @@ public class FileInfoService extends BaseService<FileInfo> {
         if (Objects.nonNull(dcTermsCreated)) {
             DateTime dateTime = DateUtil.parseUTC(dcTermsCreated.toString());
             fileParseInfo.setCreateDate(dateTime.toJdkDate());
+        }
+
+        Object metaLastAuthor = metadataAsMap.get("meta:last-author");
+        if (Objects.nonNull(metaLastAuthor)) {
+            fileParseInfo.setUpdateUserId(metaLastAuthor.toString());
+        }
+        Object dcTermsModified = metadataAsMap.get("dcterms:modified");
+        if (Objects.nonNull(dcTermsModified)) {
+            DateTime dateTime = DateUtil.parseUTC(dcTermsModified.toString());
+            fileParseInfo.setUpdateDate(dateTime.toJdkDate());
         }
         return fileParseInfo;
     }

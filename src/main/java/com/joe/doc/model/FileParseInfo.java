@@ -17,6 +17,7 @@ import java.util.Map;
 @Document
 public class FileParseInfo extends BaseEntity{
 
+    private String md5;
     private Map<String, Object> metadata;
 
 }

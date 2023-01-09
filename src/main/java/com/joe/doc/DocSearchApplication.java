@@ -24,12 +24,13 @@ public class DocSearchApplication {
         String port = env.getProperty("server.port");
         String hostAddress = InetAddress.getLocalHost().getHostAddress();
         log.info("""
+                        \r
                         ----------------------------------------------------------
-                         \tApplication '{}' is running! Access URLs:
-                         \tLocal: \t\thttp://localhost:{}
-                         \tExternal: \thttp://{}:{}
-                         \tDoc: \t\thttp://{}:{}/doc.html
-                         ----------------------------------------------------------""",
+                        \tApplication '{}' is running! Access URLs:
+                        \tLocal: \t\thttp://localhost:{}
+                        \tExternal: \thttp://{}:{}
+                        \tDoc: \t\thttp://{}:{}/doc.html
+                        ----------------------------------------------------------""",
                 applicationName, port, hostAddress, port, hostAddress, port);
     }
 

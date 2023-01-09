@@ -19,9 +19,7 @@ import java.util.Map;
 public class FileInfo extends BaseEntity{
 
     private String filename;
-    private String md5;
     private String contentType;
     private Long length;
-    private Map<String, Object> metadata;
 
 }

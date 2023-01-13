@@ -22,22 +22,4 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @Configuration
 public class MongoConfig {
 
-    /**
-     * mappingMongoConverter 用于MongoTemplate将对象保存到数据库时的转化
-     *
-     * @param factory     mongoDbFactory
-     * @param context     mongoMappingContext
-     * @param beanFactory beanFactory
-     * @return mappingMongoConverter（remove _class column）
-     */
-//    @Bean
-//    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context, BeanFactory beanFactory) throws NoSuchBeanDefinitionException {
-//        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-//        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
-//        mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
-//        // Don't save _class to mongo
-//        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-//        return mappingConverter;
-//    }
-
 }

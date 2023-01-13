@@ -1,0 +1,13 @@
+cluster.name: doc-search-es-cluster
+node.name: node-1
+# 注意至少有两个具有选举master资格的节点
+node.roles: [ master,data ]
+path.data: /elasticsearch8.2/data
+path.logs: /elasticsearch8.2/logs
+network.host: 0.0.0.0
+http.port: 9200
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+cluster.initial_master_nodes: [ "node-1", "node-2", "node-3" ]
+action.destructive_requires_name: false
+discovery.seed_hosts: [ "10.1.80.94:9300", "10.1.80.95:9300","10.1.80.96:9300" ]

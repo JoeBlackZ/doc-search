@@ -18,7 +18,10 @@ spring:
     name: doc-search
   jackson:
     time-zone: Asia/Shanghai
-
+  elasticsearch:
+    username: elastic
+    password: _vLde4vo9j*Ul5frs8cj
+    uris: http://127.0.0.1:9200
 
 springdoc:
   swagger-ui:

@@ -30,14 +30,14 @@ public class MongoConfig {
      * @param beanFactory beanFactory
      * @return mappingMongoConverter（remove _class column）
      */
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context, BeanFactory beanFactory) throws NoSuchBeanDefinitionException {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
-        mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
-        // Don't save _class to mongo
-        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        return mappingConverter;
-    }
+//    @Bean
+//    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context, BeanFactory beanFactory) throws NoSuchBeanDefinitionException {
+//        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+//        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+//        mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
+//        // Don't save _class to mongo
+//        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
+//        return mappingConverter;
+//    }
 
 }

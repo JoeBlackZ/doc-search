@@ -4,25 +4,24 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
-/**
- * @author zhangqi
- */
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
 @Slf4j
-@Service
-public class FileInfoIndexService {
+class FileInfoIndexServiceTest {
 
     @Resource
     private ElasticsearchClient esClient;
 
-    public void indexes() throws IOException {
+    @Test
+    public void testEsClusterInfo() throws IOException {
         InfoResponse infoResponse = this.esClient.info();
         String clusterName = infoResponse.clusterName();
         log.info("clusterName: {}", clusterName);
     }
-
 }

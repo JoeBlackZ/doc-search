@@ -11,3 +11,10 @@ http.cors.allow-origin: "*"
 cluster.initial_master_nodes: [ "node-1", "node-2", "node-3" ]
 action.destructive_requires_name: false
 discovery.seed_hosts: [ "10.1.80.94:9300", "10.1.80.95:9300","10.1.80.96:9300" ]
+
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
+
+ingest.geoip.downloader.enabled: false

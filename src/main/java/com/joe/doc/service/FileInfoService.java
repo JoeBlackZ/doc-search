@@ -2,9 +2,14 @@ package com.joe.doc.service;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.FileInfo;
+import com.joe.doc.model.FileInfoIndexModel;
 import com.joe.doc.model.FileParseInfo;
 import com.joe.doc.model.TikaModel;
 import com.joe.doc.repository.BaseRepository;
@@ -43,6 +48,11 @@ public class FileInfoService extends BaseService<FileInfo> {
     @Resource
     private GridFsRepository gridFsRepository;
 
+    private static final String FILE_INFO_INDEX_NAME = "file_info";
+
+    @Resource
+    private ElasticsearchClient elasticsearchClient;
+
     @Override
     public BaseRepository<FileInfo> getRepository() {
         return this.fileInfoRepository;
@@ -63,6 +73,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                         .filename(originalFilename)
                         .length(multipartFile.getSize())
                         .contentType(multipartFile.getContentType())
+                        .fileExtName(FileUtil.extName(originalFilename))
                         .build();
                 fileInfo.setId(fileInfoId);
                 fileInfo.setCreateDate(new Date());
@@ -72,7 +83,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                     log.info("文件 {}({}) 上传并保存成功.", fileInfoId, originalFilename);
                 }
                 // 提交解析文件任务
-                this.submitFileParseTask(fileInfoId);
+                this.submitFileParseTask(insert);
                 // 提交计算文件MD5的任务
                 this.submitCalcFileMd5Task(fileInfoId);
                 fileInfoIds.add(fileInfoId);
@@ -84,7 +95,8 @@ public class FileInfoService extends BaseService<FileInfo> {
         return ResponseResult.success().data(fileInfoIds).msg("文件上传完成，文件信息保存成功，异步解析任务提交成功。");
     }
 
-    private void submitFileParseTask(String fileInfoId) {
+    private void submitFileParseTask(FileInfo fileInfo) {
+        String fileInfoId = fileInfo.getId();
         GridFsResource resource = this.gridFsRepository.getGridFsFileResource(fileInfoId);
         this.fileParserService.submitFileParseTask(() -> {
             try (BufferedInputStream buffer = new BufferedInputStream(resource.getInputStream())) {
@@ -96,6 +108,17 @@ public class FileInfoService extends BaseService<FileInfo> {
                 if (Objects.nonNull(insert.getId())) {
                     log.info("文件 {} 解析完成.", fileInfoId);
                 }
+                FileInfoIndexModel fileInfoIndexModel = FileInfoIndexModel.builder()
+                        .filename(fileInfo.getFilename())
+                        .contentType(fileInfo.getContentType())
+                        .fileLength(fileInfo.getLength())
+                        .fileExtName(fileInfo.getFileExtName())
+                        .content(tikaModel.getContent())
+                        .build();
+                IndexRequest<FileInfoIndexModel> request = IndexRequest.of(i -> i.index(FILE_INFO_INDEX_NAME)
+                        .id(fileInfoId).document(fileInfoIndexModel));
+                IndexResponse indexResponse = elasticsearchClient.index(request);
+                log.info("文件信息已索引到ES, id: {}, version: {}", indexResponse.id(), indexResponse.version());
             } catch (Exception e) {
                 log.error("文件解析异常.", e);
             }

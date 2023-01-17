@@ -5,8 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.*;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.FileInfo;
 import com.joe.doc.model.FileInfoIndexModel;
@@ -96,18 +96,24 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     private void submitFileParseTask(FileInfo fileInfo) {
+        // 获取文件资源
         String fileInfoId = fileInfo.getId();
         GridFsResource resource = this.gridFsRepository.getGridFsFileResource(fileInfoId);
+        // 提交解析任务
         this.fileParserService.submitFileParseTask(() -> {
             try (BufferedInputStream buffer = new BufferedInputStream(resource.getInputStream())) {
+                // 解析文件
                 TikaModel tikaModel = fileParserService.parse(buffer);
                 Map<String, Object> metadataAsMap = tikaModel.getMetadataAsMap();
+                // 从文件元数据中获取相关的文件信息
                 FileParseInfo fileParseInfo = dealFileParseInfo(metadataAsMap);
                 fileParseInfo.setId(fileInfoId);
+                // 保存文件解析信息
                 FileParseInfo insert = fileParseInfoRepository.insert(fileParseInfo);
                 if (Objects.nonNull(insert.getId())) {
                     log.info("文件 {} 解析完成.", fileInfoId);
                 }
+                // 要索引到ES的数据
                 FileInfoIndexModel fileInfoIndexModel = FileInfoIndexModel.builder()
                         .filename(fileInfo.getFilename())
                         .contentType(fileInfo.getContentType())
@@ -145,10 +151,23 @@ public class FileInfoService extends BaseService<FileInfo> {
         this.gridFsRepository.remove(ids);
         // 删除文件解析的信息
         this.fileParseInfoRepository.deleteByIds(ids);
+        // 删除 Elasticsearch 中索引的文件信息
+        List<String> idList = Arrays.stream(ids).map(Object::toString).toList();
+        DeleteByQueryRequest queryRequest = new DeleteByQueryRequest.Builder()
+                .index(FILE_INFO_INDEX_NAME)
+                .query(query -> query.ids(idsQuery -> idsQuery.values(idList)))
+                .build();
+        try {
+            DeleteByQueryResponse queryResponse = this.elasticsearchClient.deleteByQuery(queryRequest);
+            Long deleted = queryResponse.deleted();
+            log.info("{} 个文件信息从 Elasticsearch 中删除.", deleted);
+        } catch (IOException e) {
+            log.error("删除 Elasticsearch 中索引的文件信息失败，文件ID: {}", ids);
+        }
         // 删除文件信息
         ResponseResult responseResult = super.removeByIds(ids);
         if (responseResult.ok()) {
-            log.info("文件删除成功，文件ID: {}", Arrays.toString(ids));
+            log.info("{} 个文件删除成功，传入的文件ID: {}", ids.length, Arrays.toString(ids));
         }
         return responseResult;
     }

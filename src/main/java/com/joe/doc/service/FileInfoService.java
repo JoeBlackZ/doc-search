@@ -5,12 +5,13 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import com.joe.doc.common.ResponseResult;
-import com.joe.doc.model.FileInfo;
-import com.joe.doc.model.FileInfoIndexModel;
-import com.joe.doc.model.FileParseInfo;
-import com.joe.doc.model.TikaModel;
+import com.joe.doc.model.*;
 import com.joe.doc.repository.BaseRepository;
 import com.joe.doc.repository.FileInfoRepository;
 import com.joe.doc.repository.FileParseInfoRepository;
@@ -144,6 +145,30 @@ public class FileInfoService extends BaseService<FileInfo> {
         });
     }
 
+    private FileParseInfo dealFileParseInfo(Map<String, Object> metadataAsMap) {
+        FileParseInfo fileParseInfo = FileParseInfo.builder().metadata(metadataAsMap).build();
+        Object dcCreator = metadataAsMap.get("dc:creator");
+        if (Objects.nonNull(dcCreator)) {
+            fileParseInfo.setCreateUserId(dcCreator.toString());
+        }
+        Object dcTermsCreated = metadataAsMap.get("dcterms:created");
+        if (Objects.nonNull(dcTermsCreated)) {
+            DateTime dateTime = DateUtil.parseUTC(dcTermsCreated.toString());
+            fileParseInfo.setCreateDate(dateTime.toJdkDate());
+        }
+
+        Object metaLastAuthor = metadataAsMap.get("meta:last-author");
+        if (Objects.nonNull(metaLastAuthor)) {
+            fileParseInfo.setUpdateUserId(metaLastAuthor.toString());
+        }
+        Object dcTermsModified = metadataAsMap.get("dcterms:modified");
+        if (Objects.nonNull(dcTermsModified)) {
+            DateTime dateTime = DateUtil.parseUTC(dcTermsModified.toString());
+            fileParseInfo.setUpdateDate(dateTime.toJdkDate());
+        }
+        return fileParseInfo;
+    }
+
     @Override
     public ResponseResult removeByIds(Object[] ids) {
         // 删除文件
@@ -171,27 +196,28 @@ public class FileInfoService extends BaseService<FileInfo> {
         return responseResult;
     }
 
-    private FileParseInfo dealFileParseInfo(Map<String, Object> metadataAsMap) {
-        FileParseInfo fileParseInfo = FileParseInfo.builder().metadata(metadataAsMap).build();
-        Object dcCreator = metadataAsMap.get("dc:creator");
-        if (Objects.nonNull(dcCreator)) {
-            fileParseInfo.setCreateUserId(dcCreator.toString());
+    public ResponseResult search(String keywords) {
+        Query query = new Query.Builder().queryString(q -> q.query(keywords)).build();
+        SearchRequest searchRequest = new SearchRequest.Builder().index(FILE_INFO_INDEX_NAME).query(query).build();
+        try {
+            SearchResponse<FileInfoIndexModel> searchResponse = this.elasticsearchClient.search(searchRequest, FileInfoIndexModel.class);
+            HitsMetadata<FileInfoIndexModel> hitsMetadata = searchResponse.hits();
+            List<Hit<FileInfoIndexModel>> hits = hitsMetadata.hits();
+            List<FileInfoIndexModel> searchResults = new ArrayList<>();
+            for (Hit<FileInfoIndexModel> hit : hits) {
+                FileInfoIndexModel infoIndexModel = hit.source();
+                searchResults.add(infoIndexModel);
+            }
+            TotalHits totalHits = hitsMetadata.total();
+            FileInfoSearchResult searchResult = FileInfoSearchResult.builder()
+                    .took(searchResponse.took())
+                    .hitCount(Objects.isNull(totalHits) ? 0 : totalHits.value())
+                    .fileInfos(searchResults)
+                    .build();
+            return ResponseResult.success().data(searchResult);
+        } catch (IOException e) {
+            log.error("搜过关键字[{}]异常.", keywords, e);
+            return ResponseResult.fail().msg("关键字搜索异常。");
         }
-        Object dcTermsCreated = metadataAsMap.get("dcterms:created");
-        if (Objects.nonNull(dcTermsCreated)) {
-            DateTime dateTime = DateUtil.parseUTC(dcTermsCreated.toString());
-            fileParseInfo.setCreateDate(dateTime.toJdkDate());
-        }
-
-        Object metaLastAuthor = metadataAsMap.get("meta:last-author");
-        if (Objects.nonNull(metaLastAuthor)) {
-            fileParseInfo.setUpdateUserId(metaLastAuthor.toString());
-        }
-        Object dcTermsModified = metadataAsMap.get("dcterms:modified");
-        if (Objects.nonNull(dcTermsModified)) {
-            DateTime dateTime = DateUtil.parseUTC(dcTermsModified.toString());
-            fileParseInfo.setUpdateDate(dateTime.toJdkDate());
-        }
-        return fileParseInfo;
     }
 }

@@ -48,4 +48,11 @@ public class FileController {
     public ResponseResult delete(@RequestBody String[] fileInfoIds) {
         return this.fileInfoService.removeByIds(fileInfoIds);
     }
+
+    @Operation(summary = "搜索文档")
+    @Parameter(name = "keywords", description = "搜索关键字", in = ParameterIn.QUERY)
+    @GetMapping(path = "/search")
+    public ResponseResult search(@RequestParam String keywords) {
+        return this.fileInfoService.search(keywords);
+    }
 }

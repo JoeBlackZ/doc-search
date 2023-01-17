@@ -3,6 +3,9 @@ package com.joe.doc.model;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * @author zhangqi
+ */
 @Builder
 @Data
 public class FileInfoIndexModel {

@@ -1,7 +1,6 @@
 cluster.name: doc-search-es-cluster
 node.name: node-1
 node.roles: [ master,data ]
-cluster.initial_master_nodes: [ "node-1" ]
 bootstrap.memory_lock: true
 network.host: 0.0.0.0
 http.host: 0.0.0.0

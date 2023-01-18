@@ -22,6 +22,10 @@ public enum ResponseMessage {
 
     private final String message;
 
+    public String getMessage() {
+        return message;
+    }
+
     ResponseMessage(String message) {
         this.message = message;
     }

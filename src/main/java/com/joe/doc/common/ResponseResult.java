@@ -1,5 +1,6 @@
 package com.joe.doc.common;
 
+import com.joe.doc.constant.ResponseMessage;
 import lombok.Data;
 
 import java.util.Objects;
@@ -32,8 +33,13 @@ public class ResponseResult {
         return new ResponseResult(500);
     }
 
-    public ResponseResult msg(Object object) {
-        this.msg = object.toString();
+    public ResponseResult msg(String message) {
+        this.msg = message;
+        return this;
+    }
+
+    public ResponseResult msg(ResponseMessage responseMessage) {
+        this.msg = responseMessage.getMessage();
         return this;
     }
 

@@ -1,12 +1,16 @@
 package com.joe.doc.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author zhangqi
  */
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class FileInfoIndexModel {
 

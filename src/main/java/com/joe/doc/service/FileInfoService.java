@@ -7,9 +7,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
-import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.core.search.*;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.model.*;
 import com.joe.doc.repository.BaseRepository;
@@ -49,6 +47,8 @@ public class FileInfoService extends BaseService<FileInfo> {
     private GridFsRepository gridFsRepository;
 
     private static final String FILE_INFO_INDEX_NAME = "file_info";
+    private static final String SEARCH_FIELD_FILENAME = "filename";
+    private static final String SEARCH_FIELD_CONTENT = "content";
 
     @Resource
     private ElasticsearchClient elasticsearchClient;
@@ -197,24 +197,57 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     public ResponseResult search(String keywords) {
-        Query query = new Query.Builder().queryString(q -> q.query(keywords)).build();
-        SearchRequest searchRequest = new SearchRequest.Builder().index(FILE_INFO_INDEX_NAME).query(query).build();
+        Query query = new Query.Builder()
+                .queryString(q -> q.query(keywords).fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)).build();
+        Highlight highlight = new Highlight.Builder()
+                .fields(Map.of(SEARCH_FIELD_FILENAME, new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build(),
+                        SEARCH_FIELD_CONTENT, new HighlightField.Builder().matchedFields(SEARCH_FIELD_CONTENT).build()))
+                .numberOfFragments(3)
+                .fragmentSize(150)
+                .order(HighlighterOrder.Score)
+                .preTags("<tag>").postTags("</tag>")
+                .build();
+        SearchRequest searchRequest = new SearchRequest.Builder().index(FILE_INFO_INDEX_NAME)
+                .query(query)
+                .highlight(highlight)
+                .build();
         try {
-            SearchResponse<FileInfoIndexModel> searchResponse = this.elasticsearchClient.search(searchRequest, FileInfoIndexModel.class);
-            HitsMetadata<FileInfoIndexModel> hitsMetadata = searchResponse.hits();
-            List<Hit<FileInfoIndexModel>> hits = hitsMetadata.hits();
+            SearchResponse<FileInfoSearchResult.ResultItem> searchResponse = this.elasticsearchClient.search(searchRequest,
+                    FileInfoSearchResult.ResultItem.class);
+            HitsMetadata<FileInfoSearchResult.ResultItem> hitsMetadata = searchResponse.hits();
+            List<Hit<FileInfoSearchResult.ResultItem>> hits = hitsMetadata.hits();
             List<FileInfoIndexModel> searchResults = new ArrayList<>();
-            for (Hit<FileInfoIndexModel> hit : hits) {
-                FileInfoIndexModel infoIndexModel = hit.source();
-                searchResults.add(infoIndexModel);
+            for (Hit<FileInfoSearchResult.ResultItem> hit : hits) {
+                FileInfoSearchResult.ResultItem item = hit.source();
+                if (Objects.isNull(item)) {
+                    continue;
+                }
+                Map<String, List<String>> highlightMap = hit.highlight();
+
+                List<String> filenameHighlight = highlightMap.get(SEARCH_FIELD_FILENAME);
+                if (Objects.nonNull(filenameHighlight)) {
+                    item.setFilename(String.join("", filenameHighlight));
+                }
+
+                List<String> contentHighlight = highlightMap.get(SEARCH_FIELD_CONTENT);
+                if (Objects.nonNull(contentHighlight)) {
+                    item.setContent(String.join("", contentHighlight));
+                } else {
+                    String content = item.getContent();
+                    if (Objects.nonNull(content)) {
+                        item.setContent(content.substring(0, 100));
+                    }
+                }
+
+                item.setScope(hit.score());
+                item.setId(hit.id());
+                searchResults.add(item);
             }
             TotalHits totalHits = hitsMetadata.total();
-            FileInfoSearchResult searchResult = FileInfoSearchResult.builder()
-                    .took(searchResponse.took())
+            FileInfoSearchResult searchResult = FileInfoSearchResult.builder().took(searchResponse.took())
                     .hitCount(Objects.isNull(totalHits) ? 0 : totalHits.value())
-                    .fileInfos(searchResults)
-                    .build();
-            return ResponseResult.success().data(searchResult);
+                    .fileInfos(searchResults).build();
+            return ResponseResult.success().data(searchResult).msg("搜索成功");
         } catch (IOException e) {
             log.error("搜过关键字[{}]异常.", keywords, e);
             return ResponseResult.fail().msg("关键字搜索异常。");

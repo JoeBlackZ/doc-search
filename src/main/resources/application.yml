@@ -22,6 +22,8 @@ spring:
     username: elastic
     password: _vLde4vo9j*Ul5frs8cj
     uris: http://127.0.0.1:9200
+  thymeleaf:
+    cache: false
 
 springdoc:
   swagger-ui:

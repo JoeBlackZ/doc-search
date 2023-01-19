@@ -28,11 +28,11 @@ public class SysUserService extends BaseService<SysUser> {
     }
 
     @Override
-    public ResponseResult save(SysUser sysUser) {
+    public ResponseResult<SysUser> save(SysUser sysUser) {
         String username = sysUser.getUsername();
         SysUser sysUserData = this.sysUserRepository.selectByUsername(username);
         if (Objects.nonNull(sysUserData)) {
-            return ResponseResult.fail().msg("用户名[" + username + "]已存在");
+            return ResponseResult.fail("用户名[" + username + "]已存在");
         }
         String password = sysUser.getPassword();
         if (Objects.nonNull(password)) {

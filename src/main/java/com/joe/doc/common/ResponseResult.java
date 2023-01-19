@@ -1,6 +1,7 @@
 package com.joe.doc.common;
 
 import com.joe.doc.constant.ResponseMessage;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.Objects;
@@ -11,39 +12,49 @@ import java.util.Objects;
  * @author JoezBlackZ
  */
 @Data
-public class ResponseResult {
+@Schema(name = "ResponseResult", description = "返回对象")
+public class ResponseResult<T> {
 
+    @Schema(description = "状态码")
     private int code;
 
+    @Schema(description = "消息")
     private String msg;
 
-    private Object data;
+    @Schema(description = "数据")
+    private T data;
 
+    @Schema(description = "时间戳")
     private long timestamp = System.currentTimeMillis();
 
-    private ResponseResult(int code) {
+    private ResponseResult(int code, String msg, T data) {
         this.code = code;
+        this.msg = msg;
+        this.data = data;
     }
 
-    public static ResponseResult success() {
-        return new ResponseResult(200);
+    private ResponseResult(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
-    public static ResponseResult fail() {
-        return new ResponseResult(500);
+    public static <T> ResponseResult<T> success(T data, String message) {
+        return new ResponseResult<>(200, message, data);
     }
 
-    public ResponseResult msg(String message) {
-        this.msg = message;
-        return this;
+    public static <T> ResponseResult<T> success(T data, ResponseMessage message) {
+        return new ResponseResult<>(200, message.getMessage(), data);
     }
 
-    public ResponseResult msg(ResponseMessage responseMessage) {
-        this.msg = responseMessage.getMessage();
-        return this;
+    public static <T> ResponseResult<T> fail(String message) {
+        return new ResponseResult<>(500, message);
     }
 
-    public ResponseResult data(Object object) {
+    public static <T> ResponseResult<T> fail(ResponseMessage message) {
+        return new ResponseResult<>(500, message.getMessage());
+    }
+
+    public ResponseResult<T> data(T object) {
         this.data = object;
         return this;
     }

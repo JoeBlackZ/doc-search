@@ -29,18 +29,16 @@ public abstract class BaseService<T extends BaseEntity> {
      * @param t 要保存的数据
      * @return 返回保存结果
      */
-    public ResponseResult save(T t) {
+    public ResponseResult<T> save(T t) {
         try {
             T insert = this.getRepository().insert(t);
             if (insert != null && insert.getId() != null) {
-                return ResponseResult.success().msg(ResponseMessage.SAVE_SUCCESS).data(insert);
+                return ResponseResult.success(insert, ResponseMessage.SAVE_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.SAVE_FAIL);
+        return ResponseResult.fail(ResponseMessage.SAVE_FAIL);
     }
 
     /**
@@ -49,181 +47,154 @@ public abstract class BaseService<T extends BaseEntity> {
      * @param collection 要保存的数据
      * @return 返回保存结果
      */
-    public ResponseResult saveAll(Collection<T> collection) {
+    public ResponseResult<Collection<T>> saveAll(Collection<T> collection) {
         try {
             Collection<T> results = this.getRepository().insertAll(collection);
             if (!results.isEmpty()) {
-                return ResponseResult.success().msg(ResponseMessage.SAVE_SUCCESS);
+                return ResponseResult.success(results, ResponseMessage.SAVE_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.SAVE_FAIL);
+        return ResponseResult.fail(ResponseMessage.SAVE_FAIL);
     }
 
 
-    public ResponseResult modifyById(BaseEntity baseEntity) {
+    public ResponseResult<Long> modifyById(BaseEntity baseEntity) {
         try {
             long l = this.getRepository().updateById(baseEntity);
             if (l > 0) {
-                return ResponseResult.success().msg(ResponseMessage.UPDATE_SUCCESS).data(l);
+                return ResponseResult.success(l, ResponseMessage.UPDATE_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.UPDATE_FAIL);
+        return ResponseResult.fail(ResponseMessage.UPDATE_FAIL);
     }
 
-    public ResponseResult removeByIds(Collection<? extends Serializable> collections) {
+    public ResponseResult<Long> removeByIds(Collection<? extends Serializable> collections) {
         return getResponseResult(this.getRepository().deleteByIds(collections));
     }
 
 
-    public ResponseResult removeByIds(Object[] ids) {
+    public ResponseResult<Long> removeByIds(Object[] ids) {
         return getResponseResult(this.getRepository().deleteByIds(ids));
     }
 
-    private ResponseResult getResponseResult(long l) {
+    private ResponseResult<Long> getResponseResult(long l) {
         try {
             if (l > 0) {
-                return ResponseResult.success().msg(ResponseMessage.DELETE_SUCCESS).data(l);
+                return ResponseResult.success(l, ResponseMessage.DELETE_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.DELETE_FAIL);
+        return ResponseResult.fail(ResponseMessage.DELETE_FAIL);
     }
 
-    public ResponseResult removeById(Object id) {
+    public ResponseResult<Long> removeById(Object id) {
         try {
             long l = this.getRepository().deleteById(id);
             if (l > 0) {
-                return ResponseResult.success().msg(ResponseMessage.DELETE_SUCCESS).data(l);
+                return ResponseResult.success(l, ResponseMessage.DELETE_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.DELETE_FAIL);
+        return ResponseResult.fail(ResponseMessage.DELETE_FAIL);
     }
 
 
-    private ResponseResult findAll() {
+    private ResponseResult<List<T>> findAll() {
         try {
             List<T> all = this.getRepository().selectAll();
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(all);
+            return ResponseResult.success(all, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 
-    public ResponseResult findAllByPage(int pageNum, int pageSize) {
+    public ResponseResult<List<T>> findAllByPage(int pageNum, int pageSize) {
         try {
             List<T> allByPage = this.getRepository().selectAllByPage(pageNum, pageSize);
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(allByPage);
+            return ResponseResult.success(allByPage, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 
-    public ResponseResult find(BaseEntity baseEntity) {
+    public ResponseResult<List<T>> find(BaseEntity baseEntity) {
         try {
             List<T> all = this.getRepository().select(baseEntity);
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(all);
+            return ResponseResult.success(all, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 
-    public ResponseResult findByPage(BaseEntity baseEntity, int page, int limit) {
+    public ResponseResult<List<T>> findByPage(BaseEntity baseEntity, int page, int limit) {
         try {
             if (baseEntity == null) {
                 return this.findAllByPage(page, limit);
             }
             List<T> byPage = this.getRepository().selectByPage(baseEntity, page, limit);
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(byPage);
+            return ResponseResult.success(byPage, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 
-    public ResponseResult findOne(BaseEntity baseEntity) {
+    public ResponseResult<T> findOne(BaseEntity baseEntity) {
         try {
             T one = this.getRepository().selectOne(baseEntity);
             if (one != null) {
-                return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(one);
+                return ResponseResult.success(one, ResponseMessage.QUERY_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 
-    public ResponseResult findById(Object id) {
+    public ResponseResult<T> findById(Object id) {
         try {
             T byId = this.getRepository().selectById(id);
             if (byId != null) {
-
-                return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(byId);
+                return ResponseResult.success(byId, ResponseMessage.QUERY_SUCCESS);
             }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
-
-    public ResponseResult getCount() {
+    public ResponseResult<Long> getCount() {
         try {
             long count = this.getRepository().count();
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(count);
+            return ResponseResult.success(count, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
-
-    public ResponseResult getCount(BaseEntity baseEntity) {
+    public ResponseResult<Long> getCount(BaseEntity baseEntity) {
         try {
             long count = this.getRepository().count(baseEntity);
-            return ResponseResult.success().msg(ResponseMessage.QUERY_SUCCESS).data(count);
+            return ResponseResult.success(count, ResponseMessage.QUERY_SUCCESS);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(e.getMessage(), e);
-            }
+            log.error(e.getMessage(), e);
         }
-        return ResponseResult.fail().msg(ResponseMessage.QUERY_FAIL);
+        return ResponseResult.fail(ResponseMessage.QUERY_FAIL);
     }
 
 }

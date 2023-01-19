@@ -58,12 +58,12 @@ public class FileInfoService extends BaseService<FileInfo> {
         return this.fileInfoRepository;
     }
 
-    public ResponseResult upload(List<MultipartFile> multipartFiles) {
+    public ResponseResult<List<String>> upload(List<MultipartFile> multipartFiles) {
         List<String> fileInfoIds = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             String originalFilename = multipartFile.getOriginalFilename();
             if (multipartFile.isEmpty()) {
-                log.error("File {} is empty, skip it.", originalFilename);
+                log.error("文件 [{}] 为空, 已跳过.", originalFilename);
                 continue;
             }
             try (BufferedInputStream buffer = new BufferedInputStream(multipartFile.getInputStream())) {
@@ -92,7 +92,7 @@ public class FileInfoService extends BaseService<FileInfo> {
             }
         }
         log.info("上传文件数量: {}, 提交文件数量: {}", multipartFiles.size(), fileInfoIds.size());
-        return ResponseResult.success().data(fileInfoIds).msg("文件上传完成，文件信息保存成功，异步解析任务提交成功。");
+        return ResponseResult.success(fileInfoIds, "文件上传完成，文件信息保存成功，异步解析任务提交成功。");
     }
 
     private void submitFileParseTask(FileInfo fileInfo) {
@@ -170,7 +170,7 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     @Override
-    public ResponseResult removeByIds(Object[] ids) {
+    public ResponseResult<Long> removeByIds(Object[] ids) {
         // 删除文件
         this.gridFsRepository.remove(ids);
         // 删除文件解析的信息
@@ -189,16 +189,15 @@ public class FileInfoService extends BaseService<FileInfo> {
             log.error("删除 Elasticsearch 中索引的文件信息失败，文件ID: {}", ids);
         }
         // 删除文件信息
-        ResponseResult responseResult = super.removeByIds(ids);
+        ResponseResult<Long> responseResult = super.removeByIds(ids);
         if (responseResult.ok()) {
             log.info("{} 个文件删除成功，传入的文件ID: {}", ids.length, Arrays.toString(ids));
         }
         return responseResult;
     }
 
-    public ResponseResult search(String keywords) {
-        Query query = new Query.Builder()
-                .queryString(q -> q.query(keywords).fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)).build();
+    public ResponseResult<FileInfoSearchResult> search(FileInfoSearchParam searchParam) {
+        Query query = new Query.Builder().queryString(q -> q.query(searchParam.getKeywords()).fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)).build();
         Highlight highlight = new Highlight.Builder()
                 .fields(Map.of(SEARCH_FIELD_FILENAME, new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build(),
                         SEARCH_FIELD_CONTENT, new HighlightField.Builder().matchedFields(SEARCH_FIELD_CONTENT).build()))
@@ -212,13 +211,13 @@ public class FileInfoService extends BaseService<FileInfo> {
                 .highlight(highlight)
                 .build();
         try {
-            SearchResponse<FileInfoSearchResult.ResultItem> searchResponse = this.elasticsearchClient.search(searchRequest,
-                    FileInfoSearchResult.ResultItem.class);
-            HitsMetadata<FileInfoSearchResult.ResultItem> hitsMetadata = searchResponse.hits();
-            List<Hit<FileInfoSearchResult.ResultItem>> hits = hitsMetadata.hits();
+            SearchResponse<FileInfoSearchResult.Item> searchResponse = this.elasticsearchClient.search(searchRequest,
+                    FileInfoSearchResult.Item.class);
+            HitsMetadata<FileInfoSearchResult.Item> hitsMetadata = searchResponse.hits();
+            List<Hit<FileInfoSearchResult.Item>> hits = hitsMetadata.hits();
             List<FileInfoIndexModel> searchResults = new ArrayList<>();
-            for (Hit<FileInfoSearchResult.ResultItem> hit : hits) {
-                FileInfoSearchResult.ResultItem item = hit.source();
+            for (Hit<FileInfoSearchResult.Item> hit : hits) {
+                FileInfoSearchResult.Item item = hit.source();
                 if (Objects.isNull(item)) {
                     continue;
                 }
@@ -238,7 +237,6 @@ public class FileInfoService extends BaseService<FileInfo> {
                         item.setContent(content.substring(0, 100));
                     }
                 }
-
                 item.setScope(hit.score());
                 item.setId(hit.id());
                 searchResults.add(item);
@@ -247,10 +245,10 @@ public class FileInfoService extends BaseService<FileInfo> {
             FileInfoSearchResult searchResult = FileInfoSearchResult.builder().took(searchResponse.took())
                     .hitCount(Objects.isNull(totalHits) ? 0 : totalHits.value())
                     .fileInfos(searchResults).build();
-            return ResponseResult.success().data(searchResult).msg("搜索成功");
+            return ResponseResult.success(searchResult, "搜索成功");
         } catch (IOException e) {
-            log.error("搜过关键字[{}]异常.", keywords, e);
-            return ResponseResult.fail().msg("关键字搜索异常。");
+            log.error("搜过关键字[{}]异常.", searchParam.getKeywords(), e);
+            return ResponseResult.fail("关键字搜索异常。");
         }
     }
 }

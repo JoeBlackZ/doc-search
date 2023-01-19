@@ -16,7 +16,7 @@ public class FileInfoSearchResult {
 
     @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class ResultItem extends FileInfoIndexModel {
+    public static class Item extends FileInfoIndexModel {
         private String id;
         private Double scope;
     }

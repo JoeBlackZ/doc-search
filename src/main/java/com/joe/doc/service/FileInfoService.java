@@ -3,12 +3,16 @@ package com.joe.doc.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.*;
 import com.joe.doc.common.ResponseResult;
+import com.joe.doc.constant.SearchScope;
 import com.joe.doc.model.*;
 import com.joe.doc.repository.BaseRepository;
 import com.joe.doc.repository.FileInfoRepository;
@@ -197,19 +201,17 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     public ResponseResult<FileInfoSearchResult> search(FileInfoSearchParam searchParam) {
-        Query query = new Query.Builder().queryString(q -> q.query(searchParam.getKeywords()).fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)).build();
-        Highlight highlight = new Highlight.Builder()
-                .fields(Map.of(SEARCH_FIELD_FILENAME, new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build(),
-                        SEARCH_FIELD_CONTENT, new HighlightField.Builder().matchedFields(SEARCH_FIELD_CONTENT).build()))
+        Map<String, HighlightField> fieldMap = this.getHighlightField(searchParam.getSearchScope());
+        Highlight highlight = new Highlight.Builder().fields(fieldMap)
                 .numberOfFragments(3)
                 .fragmentSize(150)
+                .noMatchSize(100)
                 .order(HighlighterOrder.Score)
                 .preTags("<tag>").postTags("</tag>")
                 .build();
+        Query query = this.getQuery(searchParam);
         SearchRequest searchRequest = new SearchRequest.Builder().index(FILE_INFO_INDEX_NAME)
-                .query(query)
-                .highlight(highlight)
-                .build();
+                .query(query).highlight(highlight).build();
         try {
             SearchResponse<FileInfoSearchResult.Item> searchResponse = this.elasticsearchClient.search(searchRequest,
                     FileInfoSearchResult.Item.class);
@@ -222,7 +224,6 @@ public class FileInfoService extends BaseService<FileInfo> {
                     continue;
                 }
                 Map<String, List<String>> highlightMap = hit.highlight();
-
                 List<String> filenameHighlight = highlightMap.get(SEARCH_FIELD_FILENAME);
                 if (Objects.nonNull(filenameHighlight)) {
                     item.setFilename(String.join("", filenameHighlight));
@@ -231,11 +232,6 @@ public class FileInfoService extends BaseService<FileInfo> {
                 List<String> contentHighlight = highlightMap.get(SEARCH_FIELD_CONTENT);
                 if (Objects.nonNull(contentHighlight)) {
                     item.setContent(String.join("", contentHighlight));
-                } else {
-                    String content = item.getContent();
-                    if (Objects.nonNull(content)) {
-                        item.setContent(content.substring(0, 100));
-                    }
                 }
                 item.setScope(hit.score());
                 item.setId(hit.id());
@@ -250,5 +246,34 @@ public class FileInfoService extends BaseService<FileInfo> {
             log.error("搜过关键字[{}]异常.", searchParam.getKeywords(), e);
             return ResponseResult.fail("关键字搜索异常。");
         }
+    }
+
+    private Query getQuery(FileInfoSearchParam searchParam) {
+        BoolQuery.Builder builder = new BoolQuery.Builder();
+        String keywords = searchParam.getKeywords();
+        String searchType = searchParam.getSearchType();
+        if (StrUtil.isBlank(searchType)) {
+            QueryStringQuery queryStringQuery = new QueryStringQuery.Builder()
+                    .fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)
+                    .query(keywords).build();
+            Query build = new Query.Builder().queryString(queryStringQuery).build();
+            builder.must(build);
+        }
+        return new Query(builder.build());
+    }
+
+    private Map<String, HighlightField> getHighlightField(String searchScope) {
+        Map<String, HighlightField> fieldMap = new HashMap<>();
+        HighlightField filenameHighlightField = new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build();
+        HighlightField contentHighlightField = new HighlightField.Builder().matchedFields(SEARCH_FIELD_CONTENT).build();
+        if (Objects.equals(SearchScope.FILENAME.getScope(), searchScope)) {
+            fieldMap.put(SEARCH_FIELD_FILENAME, filenameHighlightField);
+        } else if (Objects.equals(SearchScope.FILE_CONTENT.getScope(), searchScope)) {
+            fieldMap.put(SEARCH_FIELD_CONTENT, contentHighlightField);
+        } else {
+            fieldMap.put(SEARCH_FIELD_FILENAME, filenameHighlightField);
+            fieldMap.put(SEARCH_FIELD_CONTENT, contentHighlightField);
+        }
+        return fieldMap;
     }
 }

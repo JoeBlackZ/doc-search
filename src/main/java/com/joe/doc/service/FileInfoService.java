@@ -6,13 +6,12 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.*;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.constant.SearchScope;
+import com.joe.doc.constant.SearchType;
 import com.joe.doc.model.*;
 import com.joe.doc.repository.BaseRepository;
 import com.joe.doc.repository.FileInfoRepository;
@@ -92,7 +91,7 @@ public class FileInfoService extends BaseService<FileInfo> {
                 this.submitCalcFileMd5Task(fileInfoId);
                 fileInfoIds.add(fileInfoId);
             } catch (IOException e) {
-                throw new RuntimeException("文件[" + originalFilename + "]解析失败.", e);
+                throw new RuntimeException("文件 [" + originalFilename + "] 解析失败.", e);
             }
         }
         log.info("上传文件数量: {}, 提交文件数量: {}", multipartFiles.size(), fileInfoIds.size());
@@ -248,20 +247,6 @@ public class FileInfoService extends BaseService<FileInfo> {
         }
     }
 
-    private Query getQuery(FileInfoSearchParam searchParam) {
-        BoolQuery.Builder builder = new BoolQuery.Builder();
-        String keywords = searchParam.getKeywords();
-        String searchType = searchParam.getSearchType();
-        if (StrUtil.isBlank(searchType)) {
-            QueryStringQuery queryStringQuery = new QueryStringQuery.Builder()
-                    .fields(SEARCH_FIELD_FILENAME, SEARCH_FIELD_CONTENT)
-                    .query(keywords).build();
-            Query build = new Query.Builder().queryString(queryStringQuery).build();
-            builder.must(build);
-        }
-        return new Query(builder.build());
-    }
-
     private Map<String, HighlightField> getHighlightField(String searchScope) {
         Map<String, HighlightField> fieldMap = new HashMap<>();
         HighlightField filenameHighlightField = new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build();
@@ -275,5 +260,36 @@ public class FileInfoService extends BaseService<FileInfo> {
             fieldMap.put(SEARCH_FIELD_CONTENT, contentHighlightField);
         }
         return fieldMap;
+    }
+
+    private Query getQuery(FileInfoSearchParam searchParam) {
+        BoolQuery.Builder builder = new BoolQuery.Builder();
+        String keywords = searchParam.getKeywords();
+        String searchType = searchParam.getSearchType();
+        String searchScope = searchParam.getSearchScope();
+        List<String> queryField = this.getQueryField(searchScope);
+        if (StrUtil.isBlank(searchType) || Objects.equals(SearchType.SIMPLE_QUERY_STRING.getTypeName(), searchType)) {
+            SimpleQueryStringQuery simpleQueryStringQuery = new SimpleQueryStringQuery.Builder()
+                    .fields(queryField).query(keywords).build();
+            Query build = new Query.Builder().simpleQueryString(simpleQueryStringQuery).build();
+            builder.must(build);
+        } else if (Objects.equals(SearchType.MATCH_PHRASE.getTypeName(), searchType)) {
+            for (String field : queryField) {
+                MatchPhraseQuery matchPhraseQuery = new MatchPhraseQuery.Builder().field(field).query(keywords).build();
+                Query build = new Query.Builder().matchPhrase(matchPhraseQuery).build();
+                builder.should(build);
+            }
+        }
+        return new Query(builder.build());
+    }
+
+    private List<String> getQueryField(String searchScope) {
+        if (Objects.equals(searchScope, SearchScope.FILENAME.getScope())) {
+            return List.of(SearchScope.FILENAME.getScope());
+        } else if (Objects.equals(searchScope, SearchScope.FILE_CONTENT.getScope())) {
+            return List.of(SearchScope.FILE_CONTENT.getScope());
+        } else {
+            return Arrays.stream(SearchScope.values()).map(SearchScope::getScope).toList();
+        }
     }
 }

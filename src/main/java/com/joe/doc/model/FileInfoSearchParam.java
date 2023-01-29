@@ -3,6 +3,8 @@ package com.joe.doc.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author zhangqi
  */
@@ -16,5 +18,9 @@ public class FileInfoSearchParam {
     public String searchScope;
     @Schema(description = "搜索类型", defaultValue = "SimpleQueryString, MatchPhrase", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String searchType;
+    @Schema(description = "文件后缀", defaultValue = "docx, xlsx", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String fileExtName;
+    @Schema(description = "文件上传时间", defaultValue = "2023/01/05 13:00:00", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Date fileUploadDate;
 
 }

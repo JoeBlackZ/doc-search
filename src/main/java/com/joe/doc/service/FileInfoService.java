@@ -271,13 +271,13 @@ public class FileInfoService extends BaseService<FileInfo> {
         if (StrUtil.isBlank(searchType) || Objects.equals(SearchType.SIMPLE_QUERY_STRING.getTypeName(), searchType)) {
             SimpleQueryStringQuery simpleQueryStringQuery = new SimpleQueryStringQuery.Builder()
                     .fields(queryField).query(keywords).build();
-            Query build = new Query.Builder().simpleQueryString(simpleQueryStringQuery).build();
-            builder.must(build);
+            Query query = new Query.Builder().simpleQueryString(simpleQueryStringQuery).build();
+            builder.must(query);
         } else if (Objects.equals(SearchType.MATCH_PHRASE.getTypeName(), searchType)) {
             for (String field : queryField) {
                 MatchPhraseQuery matchPhraseQuery = new MatchPhraseQuery.Builder().field(field).query(keywords).build();
-                Query build = new Query.Builder().matchPhrase(matchPhraseQuery).build();
-                builder.should(build);
+                Query query = new Query.Builder().matchPhrase(matchPhraseQuery).build();
+                builder.should(query);
             }
         }
         return new Query(builder.build());

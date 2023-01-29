@@ -21,7 +21,9 @@ public class FileParserService {
     @Resource
     private Tika tika;
 
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 2, 1800,
+    private final static int CORE_POOL_SIZE = 2;
+    private final static int MAX_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1800,
             TimeUnit.SECONDS, new ArrayBlockingQueue<>(1024), new ThreadPoolExecutor.CallerRunsPolicy()
     );
 

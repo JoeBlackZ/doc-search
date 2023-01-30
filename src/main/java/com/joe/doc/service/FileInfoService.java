@@ -12,6 +12,8 @@ import co.elastic.clients.elasticsearch.core.search.*;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.constant.SearchScope;
 import com.joe.doc.constant.SearchType;
+import com.joe.doc.exception.FileParseException;
+import com.joe.doc.exception.SearchException;
 import com.joe.doc.model.*;
 import com.joe.doc.repository.BaseRepository;
 import com.joe.doc.repository.FileInfoRepository;
@@ -77,9 +79,9 @@ public class FileInfoService extends BaseService<FileInfo> {
                         .length(multipartFile.getSize())
                         .contentType(multipartFile.getContentType())
                         .fileExtName(FileUtil.extName(originalFilename))
+                        .fileUploadDate(new Date())
                         .build();
                 fileInfo.setId(fileInfoId);
-                fileInfo.setCreateDate(new Date());
                 // 保存文件信息
                 FileInfo insert = this.fileInfoRepository.insert(fileInfo);
                 if (Objects.nonNull(insert.getId())) {
@@ -87,11 +89,9 @@ public class FileInfoService extends BaseService<FileInfo> {
                 }
                 // 提交解析文件任务
                 this.submitFileParseTask(insert);
-                // 提交计算文件MD5的任务
-                this.submitCalcFileMd5Task(fileInfoId);
                 fileInfoIds.add(fileInfoId);
             } catch (IOException e) {
-                throw new RuntimeException("文件 [" + originalFilename + "] 解析失败.", e);
+                throw new FileParseException("文件 [" + originalFilename + "] 解析失败.", e);
             }
         }
         log.info("上传文件数量: {}, 提交文件数量: {}", multipartFiles.size(), fileInfoIds.size());
@@ -116,6 +116,8 @@ public class FileInfoService extends BaseService<FileInfo> {
                 if (Objects.nonNull(insert.getId())) {
                     log.info("文件 {} 解析完成.", fileInfoId);
                 }
+                // 提交计算文件MD5的任务
+                this.submitCalcFileMd5Task(fileInfoId);
                 // 要索引到ES的数据
                 FileInfoIndexModel fileInfoIndexModel = FileInfoIndexModel.builder()
                         .filename(fileInfo.getFilename())
@@ -149,25 +151,25 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     private FileParseInfo dealFileParseInfo(Map<String, Object> metadataAsMap) {
-        FileParseInfo fileParseInfo = FileParseInfo.builder().metadata(metadataAsMap).build();
+        FileParseInfo fileParseInfo = FileParseInfo.builder().metadata(metadataAsMap).fileParseDate(new Date()).build();
         Object dcCreator = metadataAsMap.get("dc:creator");
         if (Objects.nonNull(dcCreator)) {
-            fileParseInfo.setCreateUserId(dcCreator.toString());
+            fileParseInfo.setFileCreator(dcCreator.toString());
         }
         Object dcTermsCreated = metadataAsMap.get("dcterms:created");
         if (Objects.nonNull(dcTermsCreated)) {
             DateTime dateTime = DateUtil.parseUTC(dcTermsCreated.toString());
-            fileParseInfo.setCreateDate(dateTime.toJdkDate());
+            fileParseInfo.setFileCreateDate(dateTime.toJdkDate());
         }
 
         Object metaLastAuthor = metadataAsMap.get("meta:last-author");
         if (Objects.nonNull(metaLastAuthor)) {
-            fileParseInfo.setUpdateUserId(metaLastAuthor.toString());
+            fileParseInfo.setFileLastModified(metaLastAuthor.toString());
         }
         Object dcTermsModified = metadataAsMap.get("dcterms:modified");
         if (Objects.nonNull(dcTermsModified)) {
             DateTime dateTime = DateUtil.parseUTC(dcTermsModified.toString());
-            fileParseInfo.setUpdateDate(dateTime.toJdkDate());
+            fileParseInfo.setFileLastModifiedDate(dateTime.toJdkDate());
         }
         return fileParseInfo;
     }
@@ -248,7 +250,7 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     private Map<String, HighlightField> getHighlightField(String searchScope) {
-        Map<String, HighlightField> fieldMap = new HashMap<>();
+        Map<String, HighlightField> fieldMap = new HashMap<>(8);
         HighlightField filenameHighlightField = new HighlightField.Builder().matchedFields(SEARCH_FIELD_FILENAME).build();
         HighlightField contentHighlightField = new HighlightField.Builder().matchedFields(SEARCH_FIELD_CONTENT).build();
         if (Objects.equals(SearchScope.FILENAME.getScope(), searchScope)) {
@@ -265,7 +267,7 @@ public class FileInfoService extends BaseService<FileInfo> {
     private Query getQuery(FileInfoSearchParam searchParam) {
         String keywords = searchParam.getKeywords();
         if (StrUtil.isBlank(keywords)) {
-            throw new RuntimeException("关键字不能为空.");
+            throw new SearchException("关键字不能为空.");
         }
         BoolQuery.Builder builder = new BoolQuery.Builder();
         String searchType = searchParam.getSearchType();

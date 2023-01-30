@@ -21,14 +21,4 @@ public abstract class BaseEntity implements Serializable {
     @Indexed
     private String id;
 
-    @CreatedDate
-    private Date createDate;
-
-    private String createUserId;
-
-    @LastModifiedDate
-    private Date updateDate;
-
-    private String updateUserId;
-
 }

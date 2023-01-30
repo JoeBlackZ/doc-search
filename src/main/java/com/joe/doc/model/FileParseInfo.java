@@ -1,8 +1,10 @@
 package com.joe.doc.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -15,9 +17,15 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document
-public class FileParseInfo extends BaseEntity{
+public class FileParseInfo extends BaseEntity {
 
     private String md5;
     private Map<String, Object> metadata;
+    private String fileCreator;
+    private Date fileCreateDate;
+    private String fileLastModified;
+    private Date fileLastModifiedDate;
+    @CreatedDate
+    private Date fileParseDate;
 
 }

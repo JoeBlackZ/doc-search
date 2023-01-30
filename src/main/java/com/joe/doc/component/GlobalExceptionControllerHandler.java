@@ -3,7 +3,6 @@ package com.joe.doc.component;
 import com.joe.doc.common.ResponseResult;
 import com.joe.doc.exception.FileParseException;
 import com.joe.doc.exception.SearchException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

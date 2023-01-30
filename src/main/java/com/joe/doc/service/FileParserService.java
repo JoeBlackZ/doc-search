@@ -1,5 +1,6 @@
 package com.joe.doc.service;
 
+import com.joe.doc.exception.FileParseException;
 import com.joe.doc.model.TikaModel;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
@@ -34,7 +35,7 @@ public class FileParserService {
         try (BufferedInputStream buffer = new BufferedInputStream(new FileInputStream(file))) {
             return this.parse(buffer);
         } catch (IOException e) {
-            throw new RuntimeException("文件解析异常.", e);
+            throw new FileParseException("文件解析异常.", e);
         }
     }
 
@@ -47,7 +48,7 @@ public class FileParserService {
             String content = this.tika.parseToString(buffer, metadata);
             return TikaModel.builder().content(content).metadata(metadata).build();
         } catch (IOException | TikaException e) {
-            throw new RuntimeException("文件解析异常.", e);
+            throw new FileParseException("文件解析异常.", e);
         }
     }
 

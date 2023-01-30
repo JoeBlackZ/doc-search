@@ -263,8 +263,11 @@ public class FileInfoService extends BaseService<FileInfo> {
     }
 
     private Query getQuery(FileInfoSearchParam searchParam) {
-        BoolQuery.Builder builder = new BoolQuery.Builder();
         String keywords = searchParam.getKeywords();
+        if (StrUtil.isBlank(keywords)) {
+            throw new RuntimeException("关键字不能为空.");
+        }
+        BoolQuery.Builder builder = new BoolQuery.Builder();
         String searchType = searchParam.getSearchType();
         String searchScope = searchParam.getSearchScope();
         List<String> queryField = this.getQueryField(searchScope);
